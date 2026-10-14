@@ -1,36 +1,95 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.pnpm-store
 
-# testing
+# Testing & Coverage
 /coverage
 
-# next.js
+# Next.js Build Outputs
 /.next/
 /out/
-
-# production
 /build
+/dist
 
-# misc
-.DS_Store
+# Environment and Secret Files
+.env
+.env*.local
+.env.local
+.env.development
+.env.production
+.env.test
+!.env.example
+
+# Local SQLite Database & Data Storage
+/.data/*
+!/.data/.gitkeep
+/data/*
+!/data/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Local User Uploads (Cloudflare R2 fallback)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Certificates & Private Keys
 *.pem
+*.key
+*.crt
+*.cert
 
-# debug
+# Logs & Debug Output
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# local env files
-.env*.local
+# PM2 Process Manager
+.pm2/
+pm2.log
+*.pid
+*.seed
+*.pid.lock
 
-# vercel
+# Vercel
 .vercel
 
-# typescript
+# TypeScript & Next.js Typings
 *.tsbuildinfo
 next-env.d.ts
+
+# IDEs & Code Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swo
+*.swp
+*~
+
+# OS Metadata Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Circular Brand Glow Background -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+    <linearGradient id="ribbonYellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="ribbonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="ribbonCoral" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB7185"/>
+      <stop offset="100%" stop-color="#F43F5E"/>
+    </linearGradient>
+    <linearGradient id="ribbonGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#D97706" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded App Tile -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" stroke="#FDE68A" stroke-width="8" fill="none"/>
+
+  <!-- Intertwined Stylized "YR" Ribbon Icon -->
+  <g filter="url(#dropShadow)" transform="translate(40, 24)">
+    <!-- Yellow Main Ribbon Loop -->
+    <path d="M160 380 C160 380 130 220 220 140 C280 80 370 110 370 190 C370 270 270 320 180 390 L140 420 L216 420 C270 380 330 330 370 270" stroke="url(#ribbonYellow)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Sky Cyan Ribbon Arc -->
+    <path d="M220 140 C280 80 370 110 370 190 C370 230 340 270 290 310" stroke="url(#ribbonCyan)" stroke-width="26" stroke-linecap="round" fill="none" opacity="0.95"/>
+
+    <!-- Coral Rose Swirl -->
+    <path d="M180 200 C200 160 250 140 290 160 C330 180 340 230 310 270 C270 320 200 370 170 410" stroke="url(#ribbonCoral)" stroke-width="24" stroke-linecap="round" fill="none"/>
+
+    <!-- Emerald Flight Arrow -->
+    <path d="M330 110 L370 90 L360 135 Z" fill="url(#ribbonGreen)"/>
+    <path d="M270 140 Q320 110 360 100" stroke="url(#ribbonGreen)" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>
