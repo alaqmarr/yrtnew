@@ -13,10 +13,9 @@ const authToken = process.env.DATABASE_AUTH_TOKEN;
 function initClient(): Client {
   if (dbUrl.startsWith("file:")) {
     try {
-      const rawPath = dbUrl.replace(/^file:/, "");
-      const resolvedDir = path.dirname(path.resolve(process.cwd(), rawPath));
-      if (!fs.existsSync(resolvedDir)) {
-        fs.mkdirSync(resolvedDir, { recursive: true });
+      const dataDir = path.join(process.cwd(), ".data");
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
       }
     } catch {
       // Ignore if cannot create directory

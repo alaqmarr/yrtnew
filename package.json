@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run db:push",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update": "git stash; git pull; npm i --legacy-peer-deps; npx prisma generate; npx prisma db push; npm run build; pm2 restart yrt;",
-    "setup": "npm i --legacy-peer-deps; npx prisma generate; npx prisma db push; npm run build; PORT=3679 pm2 start \"npm run start\" --name yrt"
+    "db:push": "tsx src/infrastructure/db/migrate.ts",
+    "db:migrate": "tsx src/infrastructure/db/migrate.ts",
+    "db:seed": "tsx src/infrastructure/db/runner.ts",
+    "update": "git stash; git pull; npm i --legacy-peer-deps; npm run db:push; npm run build; pm2 restart yrt;",
+    "setup": "npm i --legacy-peer-deps; npm run db:push; npm run build; PORT=3679 pm2 start \"npm run start\" --name yrt"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1150.0",
@@ -38,6 +42,7 @@
     "eslint-config-next": "^16.4.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

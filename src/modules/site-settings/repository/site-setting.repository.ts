@@ -3,13 +3,18 @@ import { SiteSetting, SiteSettingsMap } from "../domain/site-setting.entity";
 
 export class SiteSettingRepository {
   async getAll(): Promise<SiteSetting[]> {
-    const res = await db.execute("SELECT * FROM site_settings ORDER BY group_name ASC, key ASC");
-    return res.rows.map((r) => ({
-      key: String(r.key),
-      value: String(r.value),
-      group_name: String(r.group_name || "general"),
-      updated_at: String(r.updated_at),
-    }));
+    try {
+      const res = await db.execute("SELECT * FROM site_settings ORDER BY group_name ASC, key ASC");
+      return res.rows.map((r) => ({
+        key: String(r.key),
+        value: String(r.value),
+        group_name: String(r.group_name || "general"),
+        updated_at: String(r.updated_at),
+      }));
+    } catch (err) {
+      console.warn("Could not query site_settings:", (err as Error).message);
+      return [];
+    }
   }
 
   async getAllAsMap(): Promise<SiteSettingsMap> {
@@ -22,12 +27,16 @@ export class SiteSettingRepository {
   }
 
   async getByKey(key: string, defaultValue = ""): Promise<string> {
-    const res = await db.execute({
-      sql: "SELECT value FROM site_settings WHERE key = ? LIMIT 1",
-      args: [key],
-    });
-    if (!res.rows[0]) return defaultValue;
-    return String(res.rows[0].value);
+    try {
+      const res = await db.execute({
+        sql: "SELECT value FROM site_settings WHERE key = ? LIMIT 1",
+        args: [key],
+      });
+      if (!res.rows[0]) return defaultValue;
+      return String(res.rows[0].value);
+    } catch {
+      return defaultValue;
+    }
   }
 
   async setKey(key: string, value: string, groupName = "general"): Promise<void> {

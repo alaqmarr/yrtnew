@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export const alt = "Yellow Ribbon Travels - Handcrafted Tours & Global Flights";
 export const size = {
