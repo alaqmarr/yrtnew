@@ -118,13 +118,16 @@ export default function Navbar() {
   const firstName = session?.user?.name ? session.user.name.split(" ")[0] : "Account";
   const userRole = session?.user?.role;
   const isAdmin = userRole === "admin" || userRole === "superadmin" || userRole === "staff";
+  const isHeroOverlay = !isScrolled && pathname === "/";
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 ${
+      className={`sticky top-0 z-40 print:hidden transition-all duration-300 ${
+        pathname === "/" ? "-mb-16 sm:-mb-20" : ""
+      } ${
         isScrolled
           ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80"
-          : "bg-white/90 backdrop-blur-sm border-b border-slate-100"
+          : "bg-transparent border-b border-transparent shadow-none"
       }`}
     >
       <div className="w-full px-3 sm:px-6 lg:px-10 xl:px-12 2xl:px-16">
@@ -144,11 +147,23 @@ export default function Navbar() {
               </div>
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="font-extrabold text-base sm:text-xl tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors truncate">
+              <span
+                className={`font-extrabold text-base sm:text-xl tracking-tight transition-colors truncate ${
+                  isHeroOverlay
+                    ? "text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] group-hover:text-amber-300"
+                    : "text-slate-900 group-hover:text-amber-600"
+                }`}
+              >
                 YELLOW RIBBON
               </span>
-              <span className="text-[8px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase font-semibold text-slate-500 flex items-center gap-1">
-                TRAVELS & TOURS <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-ping" />
+              <span
+                className={`text-[8px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase font-semibold flex items-center gap-1 ${
+                  isHeroOverlay
+                    ? "text-amber-200/95 drop-shadow-[0_1px_4px_rgba(0,0,0,0.65)]"
+                    : "text-slate-500"
+                }`}
+              >
+                TRAVELS & TOURS <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-ping" />
               </span>
             </div>
           </Link>
@@ -162,7 +177,11 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors relative whitespace-nowrap ${
-                    isActive
+                    isHeroOverlay
+                      ? isActive
+                        ? "text-amber-300 font-bold bg-white/15 backdrop-blur-xs drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                        : "text-white hover:text-amber-300 hover:bg-white/10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                      : isActive
                       ? "text-amber-600 font-semibold bg-amber-50/80"
                       : "text-slate-700 hover:text-amber-600 hover:bg-slate-50"
                   }`}
@@ -189,14 +208,18 @@ export default function Navbar() {
                   pathname.startsWith("/our-story") ||
                   pathname.startsWith("/team") ||
                   pathname.startsWith("/blogs")
-                    ? "text-amber-600 font-semibold bg-amber-50/80"
+                    ? isHeroOverlay
+                      ? "text-amber-300 font-bold bg-white/15"
+                      : "text-amber-600 font-semibold bg-amber-50/80"
+                    : isHeroOverlay
+                    ? "text-white hover:text-amber-300 hover:bg-white/10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
                     : "text-slate-700 hover:text-amber-600 hover:bg-slate-50"
                 }`}
               >
                 <span>Company</span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-200 ${
-                    aboutDropdown ? "rotate-180 text-amber-600" : ""
+                    aboutDropdown ? "rotate-180 text-amber-400" : ""
                   }`}
                 />
               </button>
@@ -233,7 +256,11 @@ export default function Navbar() {
               href="/contact"
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 pathname === "/contact"
-                  ? "text-amber-600 font-semibold bg-amber-50/80"
+                  ? isHeroOverlay
+                    ? "text-amber-300 font-bold bg-white/15"
+                    : "text-amber-600 font-semibold bg-amber-50/80"
+                  : isHeroOverlay
+                  ? "text-white hover:text-amber-300 hover:bg-white/10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
                   : "text-slate-700 hover:text-amber-600 hover:bg-slate-50"
               }`}
             >
@@ -253,15 +280,23 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setUserDropdown((prev) => !prev)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-slate-900 border border-amber-300/60 transition-all shadow-xs"
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl transition-all shadow-xs ${
+                    isHeroOverlay
+                      ? "bg-white/15 hover:bg-white/25 backdrop-blur-md text-white border border-white/30"
+                      : "bg-amber-50 hover:bg-amber-100 text-slate-900 border border-amber-300/60"
+                  }`}
                 >
                   <div className="w-7 h-7 rounded-xl bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shadow-xs">
                     {userInitial}
                   </div>
                   <span className="text-xs font-bold">{firstName}</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
-                      userDropdown ? "rotate-180 text-amber-600" : ""
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      userDropdown
+                        ? "rotate-180 text-amber-400"
+                        : isHeroOverlay
+                        ? "text-white/80"
+                        : "text-slate-500"
                     }`}
                   />
                 </button>
@@ -374,19 +409,27 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/account/login"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50/70 border border-slate-200/80 transition-all shadow-xs"
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
+                  isHeroOverlay
+                    ? "text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30"
+                    : "text-slate-700 hover:text-amber-600 hover:bg-amber-50/70 border border-slate-200/80"
+                }`}
               >
-                <User className="w-3.5 h-3.5 text-amber-500" />
+                <User className={`w-3.5 h-3.5 ${isHeroOverlay ? "text-amber-300" : "text-amber-500"}`} />
                 <span>Client Portal</span>
               </Link>
             )}
 
             <a
               href="tel:+919100228152"
-              className="hidden 2xl:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50/60 transition-colors border border-slate-200/80"
+              className={`hidden 2xl:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+                isHeroOverlay
+                  ? "text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30"
+                  : "text-slate-700 hover:text-amber-600 hover:bg-amber-50/60 border border-slate-200/80"
+              }`}
               title="24/7 Helpline"
             >
-              <PhoneCall className="w-3.5 h-3.5 text-amber-600" />
+              <PhoneCall className={`w-3.5 h-3.5 ${isHeroOverlay ? "text-amber-300" : "text-amber-600"}`} />
               <span>+91 91002 28152</span>
             </a>
 
@@ -414,7 +457,11 @@ export default function Navbar() {
           <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
             <Link
               href="/account"
-              className="p-1.5 sm:p-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
+              className={`p-1.5 sm:p-2 rounded-full transition-colors ${
+                isHeroOverlay
+                  ? "text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/25"
+                  : "text-slate-700 bg-slate-100 hover:bg-slate-200"
+              }`}
               title="Client Portal"
             >
               <User className="w-4 h-4" />
@@ -431,7 +478,11 @@ export default function Navbar() {
             </a>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 sm:p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none transition-colors"
+              className={`p-1.5 sm:p-2 rounded-lg focus:outline-none transition-colors ${
+                isHeroOverlay
+                  ? "text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/25"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`}
               aria-label="Toggle Navigation Menu"
             >
               {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}

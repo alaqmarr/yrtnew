@@ -106,7 +106,7 @@ export default function AboutPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-2">
+          <div className="bg-gradient-to-br from-white via-amber-50/45 to-amber-100/25 rounded-3xl p-6 border border-amber-200/70 shadow-sm space-y-2">
             <CheckCircle2 className="w-8 h-8 text-amber-500 mb-2" />
             <h4 className="font-bold text-base text-slate-900">Zero Hidden Costs</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -114,7 +114,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-2">
+          <div className="bg-gradient-to-br from-white via-cyan-50/45 to-cyan-100/25 rounded-3xl p-6 border border-cyan-200/70 shadow-sm space-y-2">
             <CheckCircle2 className="w-8 h-8 text-cyan-500 mb-2" />
             <h4 className="font-bold text-base text-slate-900">Hand-Inspected Stays</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -122,7 +122,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-2">
+          <div className="bg-gradient-to-br from-white via-emerald-50/45 to-emerald-100/25 rounded-3xl p-6 border border-emerald-200/70 shadow-sm space-y-2">
             <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-2" />
             <h4 className="font-bold text-base text-slate-900">Always-On Concierge</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -130,7 +130,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-2">
+          <div className="bg-gradient-to-br from-white via-rose-50/45 to-rose-100/25 rounded-3xl p-6 border border-rose-200/70 shadow-sm space-y-2">
             <CheckCircle2 className="w-8 h-8 text-rose-500 mb-2" />
             <h4 className="font-bold text-base text-slate-900">Ethical & Respectful</h4>
             <p className="text-xs text-slate-600 leading-relaxed">

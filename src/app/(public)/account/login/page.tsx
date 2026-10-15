@@ -47,7 +47,7 @@ export default function ClientLoginPage() {
     <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 py-8 sm:py-12 space-y-8">
       <Breadcrumbs items={[{ label: "Client Portal", href: "/account" }, { label: "Sign In" }]} />
 
-      <div className="max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xl space-y-6">
+      <div className="max-w-md mx-auto bg-gradient-to-br from-white via-white to-amber-50/45 rounded-3xl p-6 sm:p-8 border border-amber-200/70 shadow-xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mx-auto border border-amber-300/40">
             <Sparkles className="w-7 h-7 text-amber-500" />

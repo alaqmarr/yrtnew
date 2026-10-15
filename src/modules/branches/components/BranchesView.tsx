@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Branch } from "../domain/branch.entity";
 import BranchCard from "./BranchCard";
 import NearestBranchFinder from "./NearestBranchFinder";
@@ -26,13 +26,13 @@ export default function BranchesView({ branches }: BranchesViewProps) {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [sortByDistance, setSortByDistance] = useState<boolean>(true);
 
-  const handleRankedChange = (
-    ranked: BranchWithDistance[] | null,
-    loc: UserLocation | null
-  ) => {
-    setRankedBranches(ranked);
-    setUserLocation(loc);
-  };
+  const handleRankedChange = useCallback(
+    (ranked: BranchWithDistance[] | null, loc: UserLocation | null) => {
+      setRankedBranches(ranked);
+      setUserLocation(loc);
+    },
+    []
+  );
 
   const distanceMap = useMemo(() => {
     const map = new Map<string, BranchWithDistance>();

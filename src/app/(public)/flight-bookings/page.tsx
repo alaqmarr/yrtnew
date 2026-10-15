@@ -52,7 +52,7 @@ export default function FlightBookingsPage() {
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-card">
+        <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/25 rounded-3xl p-6 border border-amber-200/70 shadow-card">
           <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
             <Award className="w-6 h-6" />
           </div>
@@ -64,7 +64,7 @@ export default function FlightBookingsPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-card">
+        <div className="bg-gradient-to-br from-white via-cyan-50/40 to-cyan-100/25 rounded-3xl p-6 border border-cyan-200/70 shadow-card">
           <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center mb-4">
             <Clock className="w-6 h-6" />
           </div>
@@ -76,7 +76,7 @@ export default function FlightBookingsPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-card">
+        <div className="bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/25 rounded-3xl p-6 border border-emerald-200/70 shadow-card">
           <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
             <ShieldCheck className="w-6 h-6" />
           </div>
@@ -90,7 +90,7 @@ export default function FlightBookingsPage() {
       </div>
 
       {/* FAQs */}
-      <div className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-200/60 max-w-4xl mx-auto space-y-6">
+      <div className="bg-gradient-to-br from-amber-50/70 via-white to-cyan-50/60 rounded-3xl p-8 sm:p-12 border border-amber-200/60 max-w-4xl mx-auto space-y-6 shadow-xs">
         <div className="text-center space-y-1 mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
             Frequently Asked Questions on Flights
@@ -104,7 +104,7 @@ export default function FlightBookingsPage() {
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-2"
+              className="bg-gradient-to-r from-white via-white to-cyan-50/35 rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-2"
             >
               <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-cyan-600 shrink-0" />

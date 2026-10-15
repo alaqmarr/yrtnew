@@ -74,9 +74,120 @@ export const POPULAR_USER_CITIES: Array<{ label: string; coords: Coordinates; co
 ];
 
 /**
- * Resolve Coordinates for a given Branch object
+ * Validate latitude and longitude bounds
+ */
+function isValidLatLng(lat: number, lng: number): boolean {
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180 &&
+    !(lat === 0 && lng === 0)
+  );
+}
+
+/**
+ * Extract (trim) Latitude & Longitude from any Google Maps Embed <iframe>,
+ * pb= embed string, Google Maps Place/Share link (@lat,lng or !3dlat!4dlng),
+ * query parameter (?q=lat,lng / ?ll=lat,lng / ?destination=lat,lng), or raw "lat, lng" string.
+ */
+export function extractCoordinatesFromMapUrl(input?: string | null): Coordinates | null {
+  if (!input || typeof input !== "string") return null;
+
+  let raw = input.trim();
+  if (!raw) return null;
+
+  // 1. If full <iframe> HTML was pasted, extract the src="..." attribute first
+  const iframeSrcMatch = raw.match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch && iframeSrcMatch[1]) {
+    raw = iframeSrcMatch[1].trim();
+  }
+
+  // Decode URL-encoded characters (!2d, !3d, commas, etc.) safely
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    decoded = raw;
+  }
+
+  // 2. Priority A: Exact place pin in Google Maps URLs/Embeds -> !3d<lat>!4d<lng>
+  // (Find the last occurrence in case of route/viewport prefixes)
+  const pin3d4dMatches = [...decoded.matchAll(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/g)];
+  if (pin3d4dMatches.length > 0) {
+    const lastMatch = pin3d4dMatches[pin3d4dMatches.length - 1];
+    const lat = parseFloat(lastMatch[1]);
+    const lng = parseFloat(lastMatch[2]);
+    if (isValidLatLng(lat, lng)) {
+      return { lat, lng };
+    }
+  }
+
+  // 3. Priority B: Standard Google Maps Embed pb= parameter -> !2d<lng>!3d<lat>
+  const embed2d3dMatches = [...decoded.matchAll(/!2d(-?\d+(?:\.\d+)?)!3d(-?\d+(?:\.\d+)?)/g)];
+  if (embed2d3dMatches.length > 0) {
+    const lastMatch = embed2d3dMatches[embed2d3dMatches.length - 1];
+    const lng = parseFloat(lastMatch[1]);
+    const lat = parseFloat(lastMatch[2]);
+    if (isValidLatLng(lat, lng)) {
+      return { lat, lng };
+    }
+  }
+
+  // 4. Priority C: Google Maps URL path @<lat>,<lng> (e.g. /maps/place/.../@17.4399,78.4983,17z)
+  const atCoordMatch = decoded.match(/@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
+  if (atCoordMatch) {
+    const lat = parseFloat(atCoordMatch[1]);
+    const lng = parseFloat(atCoordMatch[2]);
+    if (isValidLatLng(lat, lng)) {
+      return { lat, lng };
+    }
+  }
+
+  // 5. Priority D: URL Query / Direction parameters (?q=, ?query=, ?ll=, ?sll=, ?center=, ?destination=, ?daddr=, /dir//)
+  const queryCoordMatch = decoded.match(
+    /(?:[?&](?:q|query|ll|sll|center|destination|daddr|viewpoint)=(?:loc:)?|\/dir\/[^/]*\/)(-?\d+(?:\.\d+)?)[,+\s]+(-?\d+(?:\.\d+)?)/i
+  );
+  if (queryCoordMatch) {
+    const lat = parseFloat(queryCoordMatch[1]);
+    const lng = parseFloat(queryCoordMatch[2]);
+    if (isValidLatLng(lat, lng)) {
+      return { lat, lng };
+    }
+  }
+
+  // 6. Priority E: Raw "lat, lng" coordinate string
+  const rawPairMatch = decoded.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if (rawPairMatch) {
+    const lat = parseFloat(rawPairMatch[1]);
+    const lng = parseFloat(rawPairMatch[2]);
+    if (isValidLatLng(lat, lng)) {
+      return { lat, lng };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Resolve Coordinates for a given Branch object:
+ * 1. First trims/extracts lat & lng from branch.map_embed_url
+ * 2. Next trims/extracts lat & lng from branch.google_maps_url
+ * 3. Falls back to known branch ID / city coordinates if no map link coordinates are present
  */
 export function getBranchCoordinates(branch: Branch): Coordinates | null {
+  const fromEmbed = extractCoordinatesFromMapUrl(branch.map_embed_url);
+  if (fromEmbed) {
+    return fromEmbed;
+  }
+
+  const fromMapsUrl = extractCoordinatesFromMapUrl(branch.google_maps_url);
+  if (fromMapsUrl) {
+    return fromMapsUrl;
+  }
+
   if (BRANCH_COORDINATES[branch.id]) {
     return BRANCH_COORDINATES[branch.id];
   }
@@ -188,8 +299,22 @@ export function rankBranchesByProximity(
  */
 export function getDirectNavigationUrl(
   userCoords: Coordinates,
-  destination: { address: string; city: string; country?: string | null }
+  destination: {
+    address: string;
+    city: string;
+    country?: string | null;
+    map_embed_url?: string | null;
+    google_maps_url?: string | null;
+  }
 ): string {
+  const exactCoords =
+    extractCoordinatesFromMapUrl(destination.map_embed_url) ||
+    extractCoordinatesFromMapUrl(destination.google_maps_url);
+
+  if (exactCoords) {
+    return `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${exactCoords.lat},${exactCoords.lng}&travelmode=driving`;
+  }
+
   const destQuery = `${destination.city}, ${destination.address}${
     destination.country && destination.country !== "India" ? `, ${destination.country}` : ""
   }`;

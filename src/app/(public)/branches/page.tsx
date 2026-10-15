@@ -35,7 +35,7 @@ export default async function BranchesPage() {
 
 
       {/* Walk-in Assurances */}
-      <div className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-200/80 max-w-4xl mx-auto space-y-6">
+      <div className="bg-gradient-to-br from-amber-50/75 via-white to-cyan-50/65 rounded-3xl p-8 sm:p-12 border border-amber-200/70 max-w-4xl mx-auto space-y-6 shadow-xs">
         <div className="text-center space-y-1">
           <h3 className="text-2xl font-bold text-slate-900">
             Why Visit a Yellow Ribbon Branch?
@@ -46,7 +46,7 @@ export default async function BranchesPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
+          <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/25 p-5 rounded-2xl border border-amber-200/70 shadow-sm text-center space-y-2">
             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
               <MapPin className="w-5 h-5" />
             </div>
@@ -56,7 +56,7 @@ export default async function BranchesPage() {
             </p>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
+          <div className="bg-gradient-to-br from-white via-cyan-50/40 to-cyan-100/25 p-5 rounded-2xl border border-cyan-200/70 shadow-sm text-center space-y-2">
             <div className="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center mx-auto">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -66,7 +66,7 @@ export default async function BranchesPage() {
             </p>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
+          <div className="bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/25 p-5 rounded-2xl border border-emerald-200/70 shadow-sm text-center space-y-2">
             <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
               <PhoneCall className="w-5 h-5" />
             </div>

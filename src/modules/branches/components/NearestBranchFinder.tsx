@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Branch } from "../domain/branch.entity";
 import {
   Coordinates,
@@ -49,6 +49,13 @@ export default function NearestBranchFinder({
   const [showCityPicker, setShowCityPicker] = useState(false);
   const [selectedCityLabel, setSelectedCityLabel] = useState<string>("");
 
+  const onRankedBranchesChangeRef = useRef(onRankedBranchesChange);
+  useEffect(() => {
+    onRankedBranchesChangeRef.current = onRankedBranchesChange;
+  }, [onRankedBranchesChange]);
+
+  const initializedRef = useRef(false);
+
   // Process coordinates and update state + parent
   const applyCoordinates = useCallback(
     (coords: Coordinates, source: "gps" | "manual", cityName?: string) => {
@@ -74,15 +81,18 @@ export default function NearestBranchFinder({
         console.error("Failed to save location", err);
       }
 
-      if (onRankedBranchesChange) {
-        onRankedBranchesChange(rankedBranches, loc);
+      if (onRankedBranchesChangeRef.current) {
+        onRankedBranchesChangeRef.current(rankedBranches, loc);
       }
     },
-    [branches, onRankedBranchesChange]
+    [branches]
   );
 
   // Restore saved location or check silent permission on mount
   useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {

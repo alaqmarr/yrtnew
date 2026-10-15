@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Branch } from "@/modules/branches/domain/branch.entity";
 import { BranchWithDistance, UserLocation } from "@/modules/branches/utils/geo";
 import NearestBranchFinder from "@/modules/branches/components/NearestBranchFinder";
@@ -16,13 +16,13 @@ export default function ContactView({ branches }: ContactViewProps) {
   const [rankedBranches, setRankedBranches] = useState<BranchWithDistance[] | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
-  const handleRankedChange = (
-    ranked: BranchWithDistance[] | null,
-    loc: UserLocation | null
-  ) => {
-    setRankedBranches(ranked);
-    setUserLocation(loc);
-  };
+  const handleRankedChange = useCallback(
+    (ranked: BranchWithDistance[] | null, loc: UserLocation | null) => {
+      setRankedBranches(ranked);
+      setUserLocation(loc);
+    },
+    []
+  );
 
   const closestBranch = rankedBranches && rankedBranches.length > 0 ? rankedBranches[0] : null;
 

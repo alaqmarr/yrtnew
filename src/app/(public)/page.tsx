@@ -10,6 +10,7 @@ import TourCard from "@/modules/tours/components/TourCard";
 import DestinationCard from "@/modules/destinations/components/DestinationCard";
 import BranchCard from "@/modules/branches/components/BranchCard";
 import WhatsAppIcon from "@/shared/components/WhatsAppIcon";
+import HeroVideoBackground from "@/shared/components/HeroVideoBackground";
 import FlightBookingPopup from "@/modules/flights/components/FlightBookingPopup";
 import {
   Sparkles,
@@ -32,6 +33,14 @@ import {
 
 export const revalidate = 60; // ISR cache revalidation every 60 seconds
 
+const DEFAULT_HERO_VIDEOS = [
+  "https://videos.pexels.com/video-files/31733343/13520588_1920_1080_30fps.mp4",
+  "https://videos.pexels.com/video-files/4010511/4010511-hd_1920_1080_25fps.mp4",
+  "https://videos.pexels.com/video-files/4010941/4010941-uhd_2560_1440_25fps.mp4",
+  "https://videos.pexels.com/video-files/37999130/16126233_2560_1440_30fps.mp4",
+  "https://videos.pexels.com/video-files/29045884/12556561_2560_1440_60fps.mp4",
+];
+
 export default async function HomePage() {
   const [featuredTours, featuredDestinations, reviews, blogs, branches, settings] = await Promise.all([
     tourService.getFeaturedTours(8),
@@ -42,28 +51,34 @@ export default async function HomePage() {
     siteSettingService.getSettingsMap(),
   ]);
 
+  const configuredHeroVideos = [
+    settings.hero_video_1,
+    settings.hero_video_2,
+    settings.hero_video_3,
+    settings.hero_video_4,
+    settings.hero_video_5,
+  ]
+    .map((u) => (u || "").trim())
+    .filter(Boolean);
+
+  const heroVideos =
+    configuredHeroVideos.length > 0
+      ? configuredHeroVideos
+      : DEFAULT_HERO_VIDEOS;
+
   return (
     <div className="w-full overflow-x-hidden">
       {/* 1. CINEMATIC FULL-BLEED HERO WITH CENTERED CURSIVE BRANDING */}
-      <section className="relative w-full min-h-[85vh] lg:min-h-[88vh] flex items-center justify-center overflow-hidden m-0">
-        {/* Cinematic Background Image */}
-        <div className="absolute inset-0 -z-20">
-          <Image
-            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=85"
-            alt="Scenic Luxury World Travel"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center scale-105 transition-transform duration-[10000ms] hover:scale-100"
-          />
-        </div>
+      <section className="relative isolate w-full min-h-[88vh] lg:min-h-[92vh] pt-16 sm:pt-20 flex items-center justify-center overflow-hidden m-0 bg-amber-950">
+        {/* Cinematic Multi-Video Background (Up to 5 Videos) */}
+        <HeroVideoBackground videos={heroVideos} />
 
-        {/* Ambient Dark & Brand Vignette Overlay for Crisp Contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/50 to-slate-950/85 -z-10" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/30 to-black/70 -z-10" />
+        {/* Subtle Warm Golden-Yellow Brand Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/35 via-amber-400/15 to-amber-950/45 z-[1] pointer-events-none" />
+        <div className="absolute inset-0 bg-radial-gradient from-amber-300/10 via-amber-900/20 to-stone-950/45 z-[1] pointer-events-none" />
 
         {/* Content Container */}
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 pt-12 sm:pt-20 pb-8 sm:pb-14 flex flex-col items-center justify-center text-center space-y-5 sm:space-y-8 z-10">
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 pt-12 sm:pt-20 pb-8 sm:pb-14 flex flex-col items-center justify-center text-center space-y-5 sm:space-y-8">
           {/* Top Pill Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-amber-300 text-[11px] sm:text-sm font-bold shadow-lg max-w-[95vw] sm:max-w-none text-center">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 shrink-0 animate-spin [animation-duration:8s]" />
@@ -81,29 +96,29 @@ export default async function HomePage() {
           </div>
 
           {/* CTA Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 pt-1 sm:pt-2 w-full max-w-2xl px-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-1 sm:pt-2 w-full max-w-md sm:max-w-2xl lg:max-w-5xl mx-auto px-2">
             <Link
               href="/tours"
-              className="w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:brightness-105 shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+              className="w-full h-12 sm:h-[52px] px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-br from-white/20 via-white/15 to-amber-400/10 hover:from-white/30 hover:to-amber-400/20 backdrop-blur-md border border-amber-200/35 shadow-lg shadow-amber-500/10 transition-all flex items-center justify-center gap-2 whitespace-nowrap transform hover:-translate-y-0.5"
             >
-              <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950" />
+              <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
               <span>Explore Tour Packages</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-amber-200 shrink-0" />
             </Link>
 
             <Link
               href="/flight-bookings"
-              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 shadow-lg transition-all flex items-center justify-center gap-2"
+              className="w-full h-12 sm:h-[52px] px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-br from-white/20 via-white/15 to-sky-400/10 hover:from-white/30 hover:to-sky-400/20 backdrop-blur-md border border-sky-200/35 shadow-lg shadow-sky-500/10 transition-all flex items-center justify-center gap-2 whitespace-nowrap transform hover:-translate-y-0.5"
             >
-              <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-300 rotate-45" />
+              <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-sky-300 rotate-45 shrink-0" />
               <span>Flight Desk</span>
             </Link>
 
             <Link
               href="/pay"
-              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-cyan-600/80 hover:bg-cyan-600 backdrop-blur-md border border-cyan-400/40 shadow-lg shadow-cyan-600/25 transition-all flex items-center justify-center gap-2"
+              className="w-full h-12 sm:h-[52px] px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-br from-white/20 via-white/15 to-cyan-400/10 hover:from-white/30 hover:to-cyan-400/20 backdrop-blur-md border border-cyan-200/35 shadow-lg shadow-cyan-500/10 transition-all flex items-center justify-center gap-2 whitespace-nowrap transform hover:-translate-y-0.5"
             >
-              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-300 shrink-0" />
               <span>Pay Online</span>
             </Link>
 
@@ -111,9 +126,9 @@ export default async function HomePage() {
               href="https://wa.me/919100228152?text=Hi%20Yellow%20Ribbon%20Travels,%20I%20would%20like%20to%20plan%20a%20holiday%20trip!"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+              className="w-full h-12 sm:h-[52px] px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-br from-white/20 via-white/15 to-emerald-400/10 hover:from-white/30 hover:to-emerald-400/20 backdrop-blur-md border border-emerald-200/35 shadow-lg shadow-emerald-500/10 transition-all flex items-center justify-center gap-2 whitespace-nowrap transform hover:-translate-y-0.5"
             >
-              <WhatsAppIcon className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
+              <WhatsAppIcon className="w-4 h-4 sm:w-5 sm:h-5 fill-emerald-300 shrink-0" />
               <span>WhatsApp Us</span>
             </a>
           </div>
@@ -168,12 +183,15 @@ export default async function HomePage() {
       </section>
 
       {/* 3. FULL-WIDTH FEATURED DESTINATIONS BENTO */}
-      <section className="w-full bg-white py-16 lg:py-20 border-b border-slate-200/80 m-0">
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
+      <section className="relative w-full bg-gradient-to-br from-amber-50/70 via-white to-orange-50/50 py-16 lg:py-20 border-b border-amber-200/50 m-0 overflow-hidden">
+        <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-amber-300/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-rose-300/10 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/60">
-                <Sparkles className="w-3.5 h-3.5" /> Iconic Getaways
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-gradient-to-r from-amber-100/80 to-orange-50 px-3 py-1 rounded-full border border-amber-200/80">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Iconic Getaways
               </div>
               <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black text-slate-950 tracking-tight">
                 Trending Destinations This Season
@@ -202,12 +220,15 @@ export default async function HomePage() {
       </section>
 
       {/* 4. FULL-WIDTH HANDPICKED TOUR PACKAGES */}
-      <section className="w-full bg-slate-50/90 py-16 lg:py-20 border-b border-slate-200/80 m-0">
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
+      <section className="relative w-full bg-gradient-to-tr from-cyan-50/75 via-sky-50/35 to-amber-50/60 py-16 lg:py-20 border-b border-cyan-200/50 m-0 overflow-hidden">
+        <div className="pointer-events-none absolute top-12 left-1/4 w-96 h-96 rounded-full bg-cyan-300/12 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-10 w-96 h-96 rounded-full bg-amber-300/12 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-3 py-1 rounded-full border border-cyan-200/60">
-                <Compass className="w-3.5 h-3.5" /> Handpicked Holidays
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-800 bg-gradient-to-r from-cyan-100/80 to-sky-50 px-3 py-1 rounded-full border border-cyan-200/80">
+                <Compass className="w-3.5 h-3.5 text-cyan-600" /> Handpicked Holidays
               </div>
               <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black text-slate-950 tracking-tight">
                 Best-Selling Tour Packages
@@ -236,10 +257,13 @@ export default async function HomePage() {
       </section>
 
       {/* 5. FULL-WIDTH "WHY YELLOW RIBBON" LUXURY FEATURE SECTION */}
-      <section className="w-full bg-white py-16 lg:py-20 border-b border-slate-200/80 m-0">
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-12">
+      <section className="relative w-full bg-gradient-to-b from-amber-50/60 via-white to-rose-50/45 py-16 lg:py-20 border-b border-amber-200/50 m-0 overflow-hidden">
+        <div className="pointer-events-none absolute -top-20 left-1/3 w-96 h-96 rounded-full bg-amber-200/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 right-1/4 w-96 h-96 rounded-full bg-emerald-200/15 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-100 to-orange-100/80 text-amber-900 border border-amber-300">
               <Award className="w-4 h-4 text-amber-600" /> The Yellow Ribbon Promise
             </div>
             <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
@@ -252,8 +276,8 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {/* 1: Yellow Ribbon */}
-            <div className="p-8 rounded-3xl bg-slate-50/70 border-2 border-amber-200/80 hover:border-amber-400 hover:shadow-card transition-all space-y-4 shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-white via-amber-50/50 to-amber-100/35 border-2 border-amber-200/80 hover:border-amber-400 hover:shadow-card transition-all space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-amber-700 flex items-center justify-center shadow-xs">
                 <MapPin className="w-7 h-7" />
               </div>
               <h3 className="text-xl font-bold text-slate-950">8+ Domestic & Global Offices</h3>
@@ -263,8 +287,8 @@ export default async function HomePage() {
             </div>
 
             {/* 2: Cyan Ribbon */}
-            <div className="p-8 rounded-3xl bg-slate-50/70 border-2 border-cyan-200/80 hover:border-cyan-400 hover:shadow-card transition-all space-y-4 shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center">
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-white via-cyan-50/50 to-cyan-100/35 border-2 border-cyan-200/80 hover:border-cyan-400 hover:shadow-card transition-all space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-100 to-cyan-200/80 text-cyan-700 flex items-center justify-center shadow-xs">
                 <Plane className="w-7 h-7 rotate-45" />
               </div>
               <h3 className="text-xl font-bold text-slate-950">IATA Verified Flight Desk</h3>
@@ -274,8 +298,8 @@ export default async function HomePage() {
             </div>
 
             {/* 3: Coral Ribbon */}
-            <div className="p-8 rounded-3xl bg-slate-50/70 border-2 border-rose-200/80 hover:border-rose-400 hover:shadow-card transition-all space-y-4 shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center">
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-white via-rose-50/50 to-rose-100/35 border-2 border-rose-200/80 hover:border-rose-400 hover:shadow-card transition-all space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-200/80 text-rose-700 flex items-center justify-center shadow-xs">
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <h3 className="text-xl font-bold text-slate-950">100% Private Chauffeured</h3>
@@ -285,8 +309,8 @@ export default async function HomePage() {
             </div>
 
             {/* 4: Emerald Ribbon */}
-            <div className="p-8 rounded-3xl bg-slate-50/70 border-2 border-emerald-200/80 hover:border-emerald-400 hover:shadow-card transition-all space-y-4 shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/35 border-2 border-emerald-200/80 hover:border-emerald-400 hover:shadow-card transition-all space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-700 flex items-center justify-center shadow-xs">
                 <WhatsAppIcon className="w-7 h-7 fill-[#25D366]" />
               </div>
               <h3 className="text-xl font-bold text-slate-950">24/7 WhatsApp Concierge</h3>
@@ -299,11 +323,13 @@ export default async function HomePage() {
       </section>
 
       {/* 6. FULL-WIDTH GOOGLE REVIEWS SHOWCASE */}
-      <section className="w-full bg-slate-50/90 py-16 lg:py-20 border-b border-slate-200/80 m-0">
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-10">
+      <section className="relative w-full bg-gradient-to-br from-amber-50/80 via-yellow-50/35 to-cyan-50/60 py-16 lg:py-20 border-b border-amber-200/50 m-0 overflow-hidden">
+        <div className="pointer-events-none absolute top-0 right-1/4 w-96 h-96 rounded-full bg-amber-300/12 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/60">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 bg-gradient-to-r from-amber-100/90 to-yellow-50 px-3 py-1 rounded-full border border-amber-200/80">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> Traveler Experiences
               </div>
               <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black text-slate-950 tracking-tight">
@@ -315,12 +341,12 @@ export default async function HomePage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 px-4 py-2 bg-white rounded-xl shadow-xs border border-slate-200 text-slate-900 font-black text-sm">
+              <div className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-white to-amber-50/70 rounded-xl shadow-xs border border-amber-200/80 text-slate-900 font-black text-sm">
                 <span>Google 4.9 ★</span>
               </div>
               <Link
                 href="/review"
-                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white transition-colors"
+                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-sm transition-all"
               >
                 All Reviews ({reviews.length}+)
               </Link>
@@ -332,7 +358,7 @@ export default async function HomePage() {
             {reviews.map((r) => (
               <div
                 key={r.id}
-                className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-card hover:shadow-card-hover transition-all space-y-4 flex flex-col justify-between"
+                className="bg-gradient-to-br from-white via-white to-amber-50/45 rounded-3xl p-6 sm:p-8 border border-amber-200/60 shadow-card hover:shadow-card-hover transition-all space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -351,7 +377,7 @@ export default async function HomePage() {
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+                <div className="pt-4 border-t border-amber-100/80 flex items-center gap-3">
                   <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-100 shrink-0">
                     <Image
                       src={r.author_avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(r.author_name)}`}
@@ -376,10 +402,13 @@ export default async function HomePage() {
       </section>
 
       {/* 7. FULL-WIDTH GLOBAL & DOMESTIC BRANCH NETWORK */}
-      <section className="w-full bg-white py-16 lg:py-20 border-b border-slate-200/80 m-0">
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
+      <section className="relative w-full bg-gradient-to-tr from-rose-50/50 via-amber-50/35 to-cyan-50/50 py-16 lg:py-20 border-b border-amber-200/50 m-0 overflow-hidden">
+        <div className="pointer-events-none absolute -top-20 -left-20 w-96 h-96 rounded-full bg-rose-300/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-cyan-300/12 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 space-y-8">
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-rose-50 to-amber-50 text-rose-700 border border-rose-200">
               <MapPin className="w-3.5 h-3.5" /> Physical Presence
             </div>
             <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black text-slate-950 tracking-tight">
@@ -399,7 +428,7 @@ export default async function HomePage() {
           <div className="text-center pt-2">
             <Link
               href="/branches"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-xs sm:text-sm font-bold text-slate-900 bg-white border border-slate-200 hover:border-amber-300 hover:shadow-card shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-xs sm:text-sm font-bold text-slate-900 bg-gradient-to-r from-white via-amber-50/40 to-white border border-amber-200/80 hover:border-amber-400 hover:shadow-card shadow-sm transition-all"
             >
               <span>Explore All Global & Domestic Offices (India, UAE, UK, Singapore)</span>
               <ChevronRight className="w-4 h-4 text-amber-500" />
@@ -409,7 +438,7 @@ export default async function HomePage() {
       </section>
 
       {/* 8. FULL-WIDTH FLIGHT DESK & CUSTOM VACATION CTA */}
-      <section className="w-full bg-slate-50/70 py-16 lg:py-20 m-0">
+      <section className="w-full bg-gradient-to-r from-amber-50/70 via-orange-50/40 to-cyan-50/60 py-16 lg:py-20 m-0">
         <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16">
           <div className="w-full bg-gradient-to-r from-brand-yellow via-amber-500 to-brand-coral rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="space-y-3 max-w-2xl text-center lg:text-left">

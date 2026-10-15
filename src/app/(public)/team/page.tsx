@@ -38,7 +38,7 @@ export default async function TeamPage() {
       </div>
 
       {/* Careers Callout */}
-      <div className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-200/80 text-center max-w-3xl mx-auto space-y-4">
+      <div className="bg-gradient-to-br from-amber-50/75 via-white to-cyan-50/60 rounded-3xl p-8 sm:p-12 border border-amber-200/70 text-center max-w-3xl mx-auto space-y-4 shadow-xs">
         <h3 className="text-2xl font-bold text-slate-900">
           Love Traveling? Join Our Growing Family
         </h3>

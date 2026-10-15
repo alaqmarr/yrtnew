@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Branch } from "../domain/branch.entity";
-import { Plus, Pencil, Trash2, Building2, MapPin, Phone, Mail, X } from "lucide-react";
+import { extractCoordinatesFromMapUrl, getBranchCoordinates } from "../utils/geo";
+import { Plus, Pencil, Trash2, Building2, MapPin, Phone, Mail, X, CheckCircle2 } from "lucide-react";
 
 interface AdminBranchesManagerProps {
   initialBranches: Branch[];
@@ -396,13 +397,13 @@ export default function AdminBranchesManager({ initialBranches }: AdminBranchesM
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Google Maps URL (For Directions Link)
+                  Google Maps URL (For Directions Link & Coordinate Extraction)
                 </label>
                 <input
                   type="url"
                   value={formData.google_maps_url}
                   onChange={(e) => setFormData({ ...formData, google_maps_url: e.target.value })}
-                  placeholder="https://maps.google.com/..."
+                  placeholder="https://www.google.com/maps/place/.../@17.4399,78.4983,17z..."
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
                 />
               </div>
@@ -426,6 +427,31 @@ export default function AdminBranchesManager({ initialBranches }: AdminBranchesM
                 <p className="text-[11px] text-slate-400 mt-1">
                   Leave blank to automatically generate an interactive Google Map from the branch address.
                 </p>
+
+                {(() => {
+                  const extracted =
+                    extractCoordinatesFromMapUrl(formData.map_embed_url) ||
+                    extractCoordinatesFromMapUrl(formData.google_maps_url);
+                  if (extracted) {
+                    return (
+                      <div className="mt-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 flex items-center gap-2 font-medium">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>
+                          <strong>Trimmed Coordinates:</strong> Lat{" "}
+                          <code className="font-mono font-bold bg-white px-1 py-0.5 rounded">
+                            {extracted.lat}
+                          </code>
+                          , Lng{" "}
+                          <code className="font-mono font-bold bg-white px-1 py-0.5 rounded">
+                            {extracted.lng}
+                          </code>{" "}
+                          — used for exact distance & nearest branch calculation.
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">

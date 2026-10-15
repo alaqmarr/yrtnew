@@ -8,15 +8,23 @@ export async function runSchemaMigration() {
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
 
-  for (const statement of statements) {
+  const tableStatements = statements.filter(
+    (s) => !/^CREATE\s+(UNIQUE\s+)?INDEX/i.test(s)
+  );
+  const indexStatements = statements.filter((s) =>
+    /^CREATE\s+(UNIQUE\s+)?INDEX/i.test(s)
+  );
+
+  // 1. Create tables if they do not exist
+  for (const statement of tableStatements) {
     try {
       await db.execute(statement);
     } catch (err) {
-      console.error("Schema statement error:", statement.slice(0, 60), err);
+      console.error("Schema table statement error:", statement.slice(0, 60), err);
     }
   }
 
-  // Safely ensure any incremental columns exist on upgraded databases without data loss
+  // 2. Safely ensure any incremental columns exist on upgraded databases before creating indexes
   const safeAlters = [
     "ALTER TABLE users ADD COLUMN department TEXT",
     "ALTER TABLE users ADD COLUMN branch_id TEXT",
@@ -38,6 +46,7 @@ export async function runSchemaMigration() {
     "ALTER TABLE bookings ADD COLUMN family_member_id TEXT",
     "ALTER TABLE flight_inquiries ADD COLUMN user_id TEXT",
     "ALTER TABLE flight_inquiries ADD COLUMN family_member_id TEXT",
+    "ALTER TABLE flight_inquiries ADD COLUMN updated_at TEXT NOT NULL DEFAULT (datetime('now'))",
   ];
 
   for (const alterSql of safeAlters) {
@@ -45,6 +54,15 @@ export async function runSchemaMigration() {
       await db.execute(alterSql);
     } catch {
       // Column already exists — safe to ignore
+    }
+  }
+
+  // 3. Create indexes now that all tables and columns are guaranteed to exist
+  for (const statement of indexStatements) {
+    try {
+      await db.execute(statement);
+    } catch (err) {
+      console.error("Schema index statement error:", statement.slice(0, 60), err);
     }
   }
 

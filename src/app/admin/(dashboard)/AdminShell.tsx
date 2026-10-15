@@ -13,7 +13,7 @@ export default function AdminShell({ userName, children }: AdminShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-amber-50/45 via-slate-50 to-cyan-50/45 text-slate-900">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:shrink-0">
         <AdminSidebar />

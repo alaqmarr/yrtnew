@@ -81,7 +81,7 @@ export default function OurStoryPage() {
       </div>
 
       {/* Timeline Section */}
-      <div className="bg-slate-50 rounded-3xl p-8 sm:p-14 border border-slate-200/80 space-y-10">
+      <div className="bg-gradient-to-br from-amber-50/75 via-white to-rose-50/60 rounded-3xl p-8 sm:p-14 border border-amber-200/70 space-y-10 shadow-xs">
         <div className="text-center max-w-xl mx-auto space-y-2">
           <h2 className="text-3xl font-bold text-slate-900">Our Milestones</h2>
           <p className="text-xs text-slate-500">
@@ -93,7 +93,7 @@ export default function OurStoryPage() {
           {milestones.map((m, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm relative group hover:shadow-md transition-shadow"
+              className="bg-gradient-to-br from-white via-white to-amber-50/45 rounded-2xl p-6 border border-amber-200/60 shadow-sm relative group hover:shadow-md transition-shadow"
             >
               <span className="text-xs font-black uppercase tracking-wider text-amber-600 block mb-2">
                 {m.year}

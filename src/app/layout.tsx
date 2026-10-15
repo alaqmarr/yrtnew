@@ -120,7 +120,7 @@ export default async function RootLayout({
       <head>
         <JsonLdSchema />
       </head>
-      <body className="antialiased min-h-screen flex flex-col bg-[#FCFDFE] text-slate-900 selection:bg-amber-100 selection:text-amber-900 font-sans">
+      <body className="antialiased min-h-screen flex flex-col bg-gradient-to-br from-amber-50/50 via-white to-cyan-50/45 text-slate-900 selection:bg-amber-100 selection:text-amber-900 font-sans">
         <AuthProvider>{children}</AuthProvider>
         <GoogleAnalytics gaId={gaId} />
       </body>

@@ -20,7 +20,11 @@ import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-slate-950 text-slate-300 pt-16 pb-12 border-t border-slate-850 relative overflow-hidden">
+    <footer className="w-full bg-gradient-to-b from-slate-900 via-slate-950 to-[#060a14] text-slate-300 pt-16 pb-12 border-t border-slate-800/80 relative overflow-hidden">
+      {/* Subtle Ambient Glow Orbs */}
+      <div className="pointer-events-none absolute -top-24 left-1/4 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl" />
+
       {/* Brand Ribbon Line Top */}
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-yellow via-brand-coral via-brand-cyan to-brand-green opacity-80" />
 
