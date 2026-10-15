@@ -19,14 +19,16 @@ export async function POST(req: NextRequest) {
 
     // Check if user with email already exists
     const existing = await db.execute({
-      sql: "SELECT id, role FROM users WHERE LOWER(email) = ? LIMIT 1",
+      sql: "SELECT id, role, password_hash FROM users WHERE LOWER(email) = ? LIMIT 1",
       args: [cleanEmail],
     });
 
     if (existing.rows[0]) {
       const existingUser = existing.rows[0];
-      // If client account was auto-provisioned from quotation or booking
-      if (String(existingUser.role) === "client") {
+      const hasPassword = Boolean(existingUser.password_hash && String(existingUser.password_hash).length > 5);
+
+      // If client account was auto-provisioned without a password from quotation or booking, allow claiming
+      if (String(existingUser.role) === "client" && !hasPassword) {
         if (password.length < 6) {
           return NextResponse.json(
             { error: "Password must be at least 6 characters long" },
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
         });
         return NextResponse.json({
           success: true,
-          message: "Welcome back! Your traveler account and quotations are now active and ready.",
+          message: "Welcome! Your traveler account and quotations are now active and ready.",
           user: {
             id: String(existingUser.id),
             name: name.trim(),

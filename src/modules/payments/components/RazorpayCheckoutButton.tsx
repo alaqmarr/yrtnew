@@ -25,7 +25,7 @@ interface RazorpayCheckoutButtonProps {
   buttonText?: string;
   className?: string;
   isTest?: boolean;
-  onSuccess?: (details: { paymentId: string; orderId: string }) => void;
+  onSuccess?: (details: { paymentId: string; orderId: string; linkCode?: string }) => void;
   onError?: (error: string) => void;
 }
 
@@ -162,6 +162,12 @@ export default function RazorpayCheckoutButton({
                 signature: response.razorpay_signature,
                 linkCode,
                 isTest,
+                amount,
+                currency,
+                customerName,
+                customerEmail,
+                customerPhone,
+                purpose,
               }),
             });
 
@@ -171,6 +177,7 @@ export default function RazorpayCheckoutButton({
                 onSuccess({
                   paymentId: response.razorpay_payment_id,
                   orderId: response.razorpay_order_id || orderData.orderId,
+                  linkCode: verifyData.linkCode || linkCode,
                 });
               } else {
                 window.location.reload();
@@ -240,6 +247,12 @@ export default function RazorpayCheckoutButton({
           signature: "simulated_test_signature",
           linkCode,
           isTest: true,
+          amount,
+          currency,
+          customerName,
+          customerEmail,
+          customerPhone,
+          purpose,
         }),
       });
 
@@ -250,6 +263,7 @@ export default function RazorpayCheckoutButton({
           onSuccess({
             paymentId: simulatedPaymentId,
             orderId: simulatedOrder.orderId,
+            linkCode: verifyData.linkCode || linkCode,
           });
         } else {
           window.location.reload();

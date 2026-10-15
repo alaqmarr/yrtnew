@@ -24,6 +24,7 @@ import {
   Tag,
   MessageSquare,
   AlertCircle,
+  Users,
 } from "lucide-react";
 import WhatsAppIcon from "@/shared/components/WhatsAppIcon";
 import { CustomerActivitySummary, TravelPreferences } from "../domain/contact.entity";
@@ -44,7 +45,7 @@ export default function Customer360Modal({
   const [data, setData] = useState<CustomerActivitySummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"overview" | "itineraries" | "payments" | "invoices" | "bookings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "itineraries" | "payments" | "invoices" | "bookings" | "family">("overview");
 
   // Editable fields
   const [internalNotes, setInternalNotes] = useState("");
@@ -304,6 +305,18 @@ export default function Customer360Modal({
           >
             <Compass className="w-3.5 h-3.5" />
             <span>Tour Bookings ({data?.bookings.length || 0})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("family")}
+            className={`py-3 px-3.5 border-b-2 transition-colors flex items-center gap-1.5 cursor-pointer ${
+              activeTab === "family"
+                ? "border-amber-500 text-amber-700 bg-white"
+                : "border-transparent hover:text-slate-900"
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Family & Co-Travelers ({data?.familyMembers?.length || 0})</span>
           </button>
         </div>
 
@@ -687,6 +700,98 @@ export default function Customer360Modal({
                             <span className="text-sm font-black text-slate-950">
                               ₹{b.total_amount.toLocaleString("en-IN")}
                             </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 6: FAMILY & CO-TRAVELERS */}
+              {activeTab === "family" && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-800">
+                        Family Members & Co-Travelers
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        Travel group profiles, passport details, dietary preferences, and linked sub-accounts.
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                      {data.familyMembers?.length || 0} Members on File
+                    </span>
+                  </div>
+
+                  {!data.familyMembers || data.familyMembers.length === 0 ? (
+                    <div className="py-12 text-center text-slate-400 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                      <Users className="w-8 h-8 mx-auto text-slate-300" />
+                      <p className="text-sm font-semibold text-slate-600">No Family Members Registered</p>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                        The client has not yet added family members or co-travelers in their portal.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {data.familyMembers.map((m) => (
+                        <div
+                          key={m.id}
+                          className="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-sm text-slate-900">{m.name}</span>
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900">
+                                  {m.relationship}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-200 text-slate-700">
+                                  {m.age_group}
+                                </span>
+                              </div>
+                              <div className="text-xs text-slate-500 mt-0.5">
+                                {m.gender || "Not specified"} {m.date_of_birth ? `• DOB: ${m.date_of_birth}` : ""}
+                              </div>
+                            </div>
+
+                            {m.member_user_id ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                                Sub-Account Active
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-md text-[10px] text-slate-400">
+                                Profile Only
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-200/60">
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-400 block uppercase">Passport</span>
+                              <span className="font-mono font-medium text-slate-800">{m.passport_number || "None"}</span>
+                              {m.passport_expiry && (
+                                <div className="text-[10px] text-slate-500">Exp: {m.passport_expiry}</div>
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-400 block uppercase">Meal / Diet</span>
+                              <span className="font-medium text-slate-800">{m.dietary_preference || "Any"}</span>
+                            </div>
+                          </div>
+
+                          {(m.email || m.phone) && (
+                            <div className="text-xs text-slate-500 flex flex-wrap gap-3 pt-1 border-t border-slate-200/40">
+                              {m.email && <span>📧 {m.email}</span>}
+                              {m.phone && <span>📞 {m.phone}</span>}
+                            </div>
+                          )}
+
+                          {m.notes && (
+                            <p className="text-[11px] text-slate-500 italic bg-white p-2 rounded-xl border border-slate-100">
+                              &ldquo;{m.notes}&rdquo;
+                            </p>
                           )}
                         </div>
                       ))}

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { ticketRepository } from "@/modules/account/repository/ticket.repository";
 
 export async function PATCH(
@@ -8,10 +7,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as { role?: string })?.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const { id } = await params;
     const body = await req.json();

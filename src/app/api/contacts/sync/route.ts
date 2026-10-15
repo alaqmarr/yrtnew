@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { contactService } from "@/modules/contacts/service/contact.service";
 
 export async function POST() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const result = await contactService.syncAllHistoricalContacts();
     return NextResponse.json({ success: true, ...result });

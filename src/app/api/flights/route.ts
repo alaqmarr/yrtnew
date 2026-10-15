@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { flightInquiryService } from "@/modules/flights/service/flight-inquiry.service";
 import { sendEmail } from "@/infrastructure/email/mailer";
 import { siteSettingService } from "@/modules/site-settings/service/site-setting.service";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const inquiries = await flightInquiryService.getAllInquiries();
     return NextResponse.json(inquiries);
@@ -23,6 +22,12 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id && !body.user_id) {
+      body.user_id = session.user.id;
+    }
+
     const created = await flightInquiryService.submitInquiry(body);
 
     // Send email notification in background

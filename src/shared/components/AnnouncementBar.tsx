@@ -14,13 +14,13 @@ export default function AnnouncementBar({
   phone = "+91 91002 28152",
 }: AnnouncementBarProps) {
   return (
-    <div className="w-full bg-slate-950 text-slate-200 text-xs sm:text-sm py-2.5 border-b border-slate-850/80 relative z-50">
-      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <div className="flex items-center gap-2 font-medium">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-            <Sparkles className="w-3 h-3 mr-1 text-amber-400 animate-pulse" /> Special Offer
+    <div className="w-full bg-slate-950 text-slate-200 text-xs sm:text-sm py-2 sm:py-2.5 border-b border-slate-800 relative z-50 overflow-hidden">
+      <div className="w-full px-3 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 flex flex-col sm:flex-row justify-between items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2 font-medium max-w-full overflow-hidden">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+            <Sparkles className="w-3 h-3 mr-1 text-amber-400 animate-pulse" /> Offer
           </span>
-          <span className="truncate text-slate-200">{bannerText}</span>
+          <span className="truncate text-[11px] sm:text-xs text-slate-200">{bannerText}</span>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
@@ -45,7 +45,7 @@ export default function AnnouncementBar({
           <span className="hidden lg:inline text-slate-700">|</span>
           <a
             href={`tel:${phone.replace(/\s+/g, "")}`}
-            className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-2.5 py-1 rounded-full"
+            className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs"
           >
             <Phone className="w-3 h-3" />
             <span>24/7 Helpline: {phone}</span>

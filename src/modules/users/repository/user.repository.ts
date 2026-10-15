@@ -133,6 +133,19 @@ export class UserRepository {
     const existing = await this.findById(id);
     if (!existing) throw new Error("User account not found");
 
+    // Safety: ensure we never deactivate or demote the last remaining active admin
+    const isTargetActiveAdmin =
+      (existing.role === "admin" || existing.role === "superadmin") && existing.is_active;
+    const willDeactivate = dto.is_active === false;
+    const willDemote = dto.role !== undefined && dto.role !== "admin" && dto.role !== "superadmin";
+
+    if (isTargetActiveAdmin && (willDeactivate || willDemote)) {
+      const activeAdminCount = await this.countAdmins();
+      if (activeAdminCount <= 1) {
+        throw new Error("Cannot deactivate or change role of the only active administrator account.");
+      }
+    }
+
     const sets: string[] = [];
     const args: InValue[] = [];
 

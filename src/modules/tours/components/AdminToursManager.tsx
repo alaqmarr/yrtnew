@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Tour } from "../domain/tour.entity";
+import { Tour, ItineraryDay } from "../domain/tour.entity";
 import { Destination } from "@/modules/destinations/domain/destination.entity";
 import {
   Plus,
@@ -14,12 +14,21 @@ import {
   X,
   CheckCircle,
   ExternalLink,
+  Calendar,
 } from "lucide-react";
 
 interface AdminToursManagerProps {
   initialTours: Tour[];
   destinations: Destination[];
 }
+
+const DEFAULT_ITINERARY_DAYS: ItineraryDay[] = [
+  { day: 1, title: "Arrival & Hotel Check-in", description: "Arrive at destination, receive warm welcome and private transfer to your hotel." },
+  { day: 2, title: "Iconic Sights & Cultural Tour", description: "Full-day guided exploration of major monuments, historic landmarks and local markets." },
+  { day: 3, title: "Scenic Countryside Excursion", description: "Scenic drive through picturesque valleys, nature walks and photo stops." },
+  { day: 4, title: "Leisure & Adventure Activities", description: "Free day for optional adventure sports, shopping and leisure." },
+  { day: 5, title: "Departure with Sweet Memories", description: "Breakfast, checkout, and on-time private transfer to airport for departure." },
+];
 
 export default function AdminToursManager({
   initialTours,
@@ -47,6 +56,7 @@ export default function AdminToursManager({
     inclusionsText: "Hotel Accommodations\nDaily Breakfast & Dinner\nAll Transfers",
     exclusionsText: "Flight tickets\nPersonal expenses\nTips",
     imagesText: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=1000&q=80",
+    itinerary: DEFAULT_ITINERARY_DAYS,
   });
 
   const openCreateModal = () => {
@@ -67,6 +77,7 @@ export default function AdminToursManager({
       inclusionsText: "Hotel Accommodations\nDaily Breakfast & Dinner\nAll Transfers",
       exclusionsText: "Flight tickets\nPersonal expenses\nTips",
       imagesText: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=1000&q=80",
+      itinerary: DEFAULT_ITINERARY_DAYS,
     });
     setError("");
     setIsModalOpen(true);
@@ -74,6 +85,15 @@ export default function AdminToursManager({
 
   const openEditModal = (tour: Tour) => {
     setEditingTour(tour);
+    const existingItinerary =
+      tour.itinerary && tour.itinerary.length > 0
+        ? tour.itinerary
+        : Array.from({ length: tour.duration_days || 1 }, (_, i) => ({
+            day: i + 1,
+            title: `Day ${i + 1}`,
+            description: "",
+          }));
+
     setFormData({
       title: tour.title,
       subtitle: tour.subtitle || "",
@@ -90,9 +110,45 @@ export default function AdminToursManager({
       inclusionsText: tour.inclusions.join("\n"),
       exclusionsText: tour.exclusions.join("\n"),
       imagesText: tour.images.join("\n"),
+      itinerary: existingItinerary,
     });
     setError("");
     setIsModalOpen(true);
+  };
+
+  const handleAddDay = () => {
+    const nextDay = formData.itinerary.length + 1;
+    setFormData((prev) => ({
+      ...prev,
+      itinerary: [
+        ...prev.itinerary,
+        { day: nextDay, title: `Day ${nextDay}`, description: "" },
+      ],
+      duration_days: Math.max(prev.duration_days, nextDay),
+      duration_nights: Math.max(prev.duration_nights, nextDay - 1),
+    }));
+  };
+
+  const handleRemoveDay = (index: number) => {
+    setFormData((prev) => {
+      const updated = prev.itinerary
+        .filter((_, i) => i !== index)
+        .map((item, idx) => ({ ...item, day: idx + 1 }));
+      return {
+        ...prev,
+        itinerary: updated,
+        duration_days: Math.max(1, updated.length),
+        duration_nights: Math.max(0, updated.length - 1),
+      };
+    });
+  };
+
+  const handleUpdateDay = (index: number, field: "title" | "description", value: string) => {
+    setFormData((prev) => {
+      const updated = [...prev.itinerary];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, itinerary: updated };
+    });
   };
 
   const reloadTours = async () => {
@@ -118,6 +174,7 @@ export default function AdminToursManager({
       original_price: Number(formData.original_price) || null,
       featured: formData.featured,
       overview: formData.overview,
+      itinerary: formData.itinerary,
       highlights: formData.highlightsText
         .split("\n")
         .map((s) => s.trim())
@@ -471,6 +528,63 @@ export default function AdminToursManager({
                   placeholder="Describe the entire experience..."
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                 />
+              </div>
+
+              {/* Day-by-Day Itinerary Builder */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Day-by-Day Tour Itinerary ({formData.itinerary.length} Days)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddDay}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add Day</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1 [scrollbar-width:thin]">
+                  {formData.itinerary.map((item, index) => (
+                    <div
+                      key={index}
+                      className="p-3 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2 text-xs"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-slate-900 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] shrink-0">
+                          Day {item.day}
+                        </span>
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => handleUpdateDay(index, "title", e.target.value)}
+                          placeholder="Day Title (e.g. Arrival in Srinagar & Shikara Ride)"
+                          className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-amber-500"
+                        />
+                        {formData.itinerary.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveDay(index)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0 cursor-pointer"
+                            title="Remove Day"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={item.description}
+                        onChange={(e) => handleUpdateDay(index, "description", e.target.value)}
+                        placeholder="Day highlights, travel activities and sightseeing description..."
+                        className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>

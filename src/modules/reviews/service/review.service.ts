@@ -49,8 +49,18 @@ export class ReviewService {
       const data = await res.json();
 
       if (data.result?.reviews) {
+        const existingReviews = await reviewRepository.findAll();
         let count = 0;
         for (const gr of data.result.reviews) {
+          if (!gr.text || !gr.author_name) continue;
+          const isDuplicate = existingReviews.some(
+            (r) =>
+              r.source === "Google" &&
+              r.author_name.toLowerCase() === gr.author_name.toLowerCase() &&
+              r.comment.trim() === gr.text.trim()
+          );
+          if (isDuplicate) continue;
+
           await reviewRepository.create({
             author_name: gr.author_name,
             author_avatar: gr.profile_photo_url,
@@ -61,7 +71,13 @@ export class ReviewService {
           });
           count++;
         }
-        return { synced: count, message: `Successfully synced ${count} reviews from Google Places` };
+        return {
+          synced: count,
+          message:
+            count > 0
+              ? `Successfully synced ${count} new reviews from Google Places`
+              : "All Google Places reviews are already synced and up to date.",
+        };
       }
       return { synced: 0, message: "No new reviews returned from Google Places API" };
     } catch (err) {

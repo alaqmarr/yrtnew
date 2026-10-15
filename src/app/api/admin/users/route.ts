@@ -48,12 +48,30 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, email, password, role: userRole, phone, department, branch_id, is_active } = body;
+    const {
+      name,
+      email,
+      password,
+      role: userRole,
+      phone,
+      department,
+      branch_id,
+      is_active,
+    } = body;
+    const ALLOWED_ROLES = ["client", "staff", "admin", "superadmin"];
+    const targetRole = userRole || "staff";
 
-    if (!name || !email || !password) {
+    if (!ALLOWED_ROLES.includes(targetRole)) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { error: `Invalid role: ${targetRole}. Must be one of: ${ALLOWED_ROLES.join(", ")}` },
         { status: 400 }
+      );
+    }
+
+    if (targetRole === "superadmin" && role !== "superadmin") {
+      return NextResponse.json(
+        { error: "Forbidden: Only superadministrators can create superadmin accounts" },
+        { status: 403 }
       );
     }
 
@@ -61,7 +79,7 @@ export async function POST(req: NextRequest) {
       name,
       email,
       password,
-      role: userRole || "staff",
+      role: targetRole,
       phone,
       department,
       branch_id,

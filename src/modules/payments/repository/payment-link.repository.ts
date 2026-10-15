@@ -74,6 +74,53 @@ export class PaymentLinkRepository {
     return (await this.findById(id))!;
   }
 
+  async createPaid(
+    data: {
+      customer_name: string;
+      customer_phone: string;
+      customer_email?: string | null;
+      amount: number;
+      currency?: string;
+      purpose: string;
+      description?: string | null;
+      razorpay_order_id?: string | null;
+      razorpay_payment_id: string;
+      paid_at?: string;
+    },
+    linkCode: string
+  ): Promise<PaymentLink> {
+    const id = `pl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const now = new Date().toISOString();
+    const paidAt = data.paid_at || now;
+
+    await db.execute({
+      sql: `INSERT INTO payment_links (
+        id, link_code, customer_name, customer_email, customer_phone, amount, currency,
+        purpose, description, status, razorpay_order_id, razorpay_payment_id, paid_at,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?, ?)`,
+      args: [
+        id,
+        linkCode,
+        data.customer_name,
+        data.customer_email ?? null,
+        data.customer_phone,
+        data.amount,
+        data.currency || "INR",
+        data.purpose,
+        data.description ?? null,
+        data.razorpay_order_id ?? null,
+        data.razorpay_payment_id,
+        paidAt,
+        now,
+        now,
+      ],
+    });
+
+    return (await this.findById(id))!;
+  }
+
+
   async updateStatus(data: UpdatePaymentLinkStatusDto): Promise<PaymentLink> {
     const now = new Date().toISOString();
     await db.execute({

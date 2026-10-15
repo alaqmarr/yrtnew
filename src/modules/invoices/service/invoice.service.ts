@@ -13,9 +13,9 @@ export class InvoiceService {
 
   async createInvoice(data: CreateInvoiceDto): Promise<Invoice> {
     const year = new Date().getFullYear();
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const entropy = `${Date.now().toString(36).slice(-4)}${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
     const prefix = data.type === "Quote" ? "QTE" : "INV";
-    const invoiceNumber = `${prefix}-${year}-${randomNum}`;
+    const invoiceNumber = `${prefix}-${year}-${entropy}`;
 
     const created = await invoiceRepository.create(data, invoiceNumber);
 

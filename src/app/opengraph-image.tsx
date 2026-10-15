@@ -108,7 +108,7 @@ export default async function OpenGraphImage() {
               fontWeight: 700,
             }}
           >
-            ★ 4.9 / 5 Rating • 480+ Reviews
+            4.9 / 5 Rating • 480+ Reviews
           </div>
         </div>
 
@@ -157,9 +157,9 @@ export default async function OpenGraphImage() {
           }}
         >
           <div style={{ display: "flex", gap: 24, fontSize: 14, color: "#CBD5E1", fontWeight: 600 }}>
-            <span>✈ IATA Certified Global Ticketing</span>
-            <span>📍 8+ Global Branch Offices</span>
-            <span>💳 Instant Razorpay Checkout</span>
+            <span>• IATA Certified Global Ticketing</span>
+            <span>• 8+ Global Branch Offices</span>
+            <span>• Instant Razorpay Checkout</span>
           </div>
 
           <div

@@ -65,8 +65,16 @@ export class PaymentService {
     isTest?: boolean;
     mode?: "live" | "test";
   }): Promise<{ orderId: string; amount: number; currency: string; keyId: string; mode: "live" | "test" }> {
-    const targetMode: "live" | "test" = params.isTest || params.mode === "test" ? "test" : "live";
+    const targetMode: "live" | "test" | undefined = params.mode || (params.isTest ? "test" : undefined);
     const { instance, config } = await this.getRazorpayInstance(targetMode);
+
+    if (!config.enabled) {
+      throw new Error("Online payments are currently disabled in settings.");
+    }
+
+    if (!config.keyId || !config.keySecret) {
+      throw new Error("Razorpay API credentials are not configured.");
+    }
 
     const currency = params.currency || config.currency;
     const amountInSubunits = Math.round(params.amount * 100); // In paise for INR
@@ -87,16 +95,19 @@ export class PaymentService {
         mode: config.mode,
       };
     } catch (error) {
-      console.warn("Razorpay API notice (generating test sandbox order):", (error as Error).message || error);
-      // In case test keys are mock/sandbox placeholders without active API network access:
-      const simulatedOrderId = `order_sim_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      return {
-        orderId: simulatedOrderId,
-        amount: params.amount,
-        currency,
-        keyId: config.keyId,
-        mode: config.mode,
-      };
+      console.warn("Razorpay API order creation notice:", (error as Error).message || error);
+      // Only allow local development fallback when explicitly in dev environment with non-live keys
+      if (process.env.NODE_ENV !== "production" && config.mode === "test") {
+        const simulatedOrderId = `order_sim_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        return {
+          orderId: simulatedOrderId,
+          amount: params.amount,
+          currency,
+          keyId: config.keyId,
+          mode: config.mode,
+        };
+      }
+      throw error;
     }
   }
 
@@ -107,16 +118,28 @@ export class PaymentService {
     isTest?: boolean;
     mode?: "live" | "test";
   }): Promise<boolean> {
-    const targetMode: "live" | "test" = params.isTest || params.mode === "test" ? "test" : "live";
+    const targetMode: "live" | "test" | undefined = params.mode || (params.isTest ? "test" : undefined);
     const config = await this.getRazorpayConfig(targetMode);
 
-    // If order or payment was simulated during sandbox testing
+    if (!params.paymentId || !params.orderId) {
+      return false;
+    }
+
+    // Only allow simulated bypass in local dev test mode when key is empty or placeholder mock
+    const isMockLocalDev =
+      process.env.NODE_ENV !== "production" &&
+      config.mode === "test" &&
+      (!config.keySecret || config.keySecret.includes("mock") || config.keySecret === "placeholder");
+
     if (
-      params.orderId?.startsWith("order_sim_") ||
-      params.paymentId?.startsWith("pay_sim_") ||
-      params.isTest
+      isMockLocalDev &&
+      (params.orderId?.startsWith("order_sim_") || params.paymentId?.startsWith("pay_sim_"))
     ) {
-      return Boolean(params.paymentId);
+      return true;
+    }
+
+    if (!config.keySecret || !params.signature) {
+      return false;
     }
 
     try {
@@ -125,7 +148,10 @@ export class PaymentService {
         .update(`${params.orderId}|${params.paymentId}`)
         .digest("hex");
 
-      return generatedSignature === params.signature;
+      const a = Buffer.from(generatedSignature);
+      const b = Buffer.from(params.signature);
+      if (a.length !== b.length) return false;
+      return crypto.timingSafeEqual(a, b);
     } catch (err) {
       console.error("Signature verification error:", err);
       return false;
@@ -134,7 +160,7 @@ export class PaymentService {
 
   async createPaymentLink(data: CreatePaymentLinkDto): Promise<PaymentLink> {
     const prefix = "PAY";
-    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const randomSuffix = `${Date.now().toString(36).slice(-4)}${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
     const cleanPurpose = data.purpose
       .replace(/[^a-zA-Z0-9]/g, "")
       .substring(0, 6)
@@ -191,6 +217,38 @@ export class PaymentService {
     }
     return updated;
   }
+
+  async recordCustomPayment(data: {
+    customer_name: string;
+    customer_phone: string;
+    customer_email?: string | null;
+    amount: number;
+    currency?: string;
+    purpose: string;
+    description?: string | null;
+    razorpay_order_id?: string | null;
+    razorpay_payment_id: string;
+    link_code?: string;
+  }): Promise<PaymentLink> {
+    const linkCode =
+      data.link_code || `PAY-${data.razorpay_payment_id.slice(-6).toUpperCase()}`;
+    const created = await paymentLinkRepository.createPaid(data, linkCode);
+    contactService
+      .recordCustomerActivity({
+        name: data.customer_name,
+        phone: data.customer_phone,
+        email: data.customer_email ?? undefined,
+        amount: data.amount,
+        isPaid: true,
+        source: "Razorpay Custom Payment",
+        notes: `Payment settled: ₹${data.amount} for ${data.purpose} (Txn: ${data.razorpay_payment_id})`,
+      })
+      .catch((err) =>
+        console.error("Auto-recording contact for custom payment failed:", err)
+      );
+    return created;
+  }
+
 
   async deletePaymentLink(id: string): Promise<boolean> {
     return paymentLinkRepository.delete(id);

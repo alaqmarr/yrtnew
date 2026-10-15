@@ -9,6 +9,8 @@ declare module "next-auth" {
       phone?: string | null;
       department?: string | null;
       branch_id?: string | null;
+      family_head_id?: string | null;
+      relationship_to_head?: string | null;
     } & DefaultSession["user"];
   }
 
@@ -18,6 +20,8 @@ declare module "next-auth" {
     phone?: string | null;
     department?: string | null;
     branch_id?: string | null;
+    family_head_id?: string | null;
+    relationship_to_head?: string | null;
   }
 }
 
@@ -28,5 +32,7 @@ declare module "next-auth/jwt" {
     phone?: string | null;
     department?: string | null;
     branch_id?: string | null;
+    family_head_id?: string | null;
+    relationship_to_head?: string | null;
   }
 }

@@ -14,7 +14,25 @@ export class BookingService {
     if (!data.customer_name || !data.customer_email || !data.customer_phone) {
       throw new Error("Full name, email and phone number are required");
     }
-    return bookingRepository.create(data);
+    const created = await bookingRepository.create(data);
+
+    // Automatically record / update customer profile in Unified Contacts CRM
+    try {
+      const { contactService } = await import("@/modules/contacts/service/contact.service");
+      await contactService.recordCustomerActivity({
+        name: data.customer_name,
+        phone: data.customer_phone,
+        email: data.customer_email,
+        amount: data.total_amount || 0,
+        isPaid: false,
+        source: "Tour Booking Inquiry",
+        notes: `Tour: ${data.tour_id || "Custom"} | Travelers: ${data.travelers_count} | Travel Date: ${data.travel_date}`,
+      });
+    } catch (crmErr) {
+      console.warn("Auto-sync contact for booking non-fatal error:", crmErr);
+    }
+
+    return created;
   }
 
   async updateStatus(id: string, status: Booking["status"]): Promise<Booking> {

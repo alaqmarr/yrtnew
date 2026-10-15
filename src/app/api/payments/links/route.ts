@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { paymentService } from "@/modules/payments/service/payment.service";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const links = await paymentService.getAllPaymentLinks();
     return NextResponse.json(links);
@@ -20,10 +17,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const body = await req.json();
     const { customer_name, customer_phone, amount, purpose } = body;

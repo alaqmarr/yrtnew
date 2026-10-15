@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { bookingService } from "@/modules/bookings/service/booking.service";
 import { sendEmail } from "@/infrastructure/email/mailer";
 import { siteSettingService } from "@/modules/site-settings/service/site-setting.service";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const bookings = await bookingService.getAllBookings();
     return NextResponse.json(bookings);
@@ -23,6 +22,12 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id && !body.user_id) {
+      body.user_id = session.user.id;
+    }
+
     const created = await bookingService.createBooking(body);
 
     // Send email notification in background (non-blocking)

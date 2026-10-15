@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { contactService } from "@/modules/contacts/service/contact.service";
 
 type RouteProps = {
@@ -9,10 +8,8 @@ type RouteProps = {
 
 export async function GET(req: NextRequest, { params }: RouteProps) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const { id } = await params;
     const summary = await contactService.getContactById(id);
@@ -30,10 +27,8 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
 
 export async function PUT(req: NextRequest, { params }: RouteProps) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const { id } = await params;
     const body = await req.json();
@@ -52,10 +47,8 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
 
 export async function DELETE(req: NextRequest, { params }: RouteProps) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const { id } = await params;
     const success = await contactService.deleteContact(id);

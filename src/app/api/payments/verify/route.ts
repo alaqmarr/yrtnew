@@ -26,8 +26,25 @@ export async function POST(req: NextRequest) {
     }
 
     // If linked to a payment link, mark it as paid
+    let finalLinkCode = linkCode;
     if (linkCode) {
       await paymentService.markLinkPaid(linkCode, paymentId, orderId);
+    } else if (body.amount && body.customerName && body.customerPhone) {
+      try {
+        const link = await paymentService.recordCustomPayment({
+          customer_name: body.customerName,
+          customer_phone: body.customerPhone,
+          customer_email: body.customerEmail || null,
+          amount: Number(body.amount),
+          currency: body.currency || "INR",
+          purpose: body.purpose || "Online Travel Payment",
+          razorpay_order_id: orderId || null,
+          razorpay_payment_id: paymentId,
+        });
+        finalLinkCode = link.link_code;
+      } catch (err) {
+        console.error("Error recording custom payment link:", err);
+      }
     }
 
     return NextResponse.json({
@@ -35,7 +52,9 @@ export async function POST(req: NextRequest) {
       message: "Payment successfully verified and recorded!",
       paymentId,
       orderId,
+      linkCode: finalLinkCode,
     });
+
   } catch (error) {
     console.error("POST /api/payments/verify error:", error);
     return NextResponse.json(

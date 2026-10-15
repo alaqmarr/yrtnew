@@ -255,8 +255,47 @@ export class ContactService {
       args: [`%${last10}%`, email],
     });
 
+    // 5. Family Members
+    let familyMembers: any[] = [];
+    try {
+      const userRes = await db.execute({
+        sql: `SELECT id FROM users WHERE (email = ? AND email != '') OR phone = ? LIMIT 1`,
+        args: [email, contact.phone],
+      });
+
+      if (userRes.rows.length > 0) {
+        const userId = String(userRes.rows[0].id);
+        const famRes = await db.execute({
+          sql: `SELECT * FROM family_members WHERE primary_user_id = ? ORDER BY created_at ASC`,
+          args: [userId],
+        });
+        familyMembers = famRes.rows.map((r: any) => ({
+          id: String(r.id),
+          primary_user_id: String(r.primary_user_id),
+          member_user_id: r.member_user_id ? String(r.member_user_id) : null,
+          name: String(r.name),
+          relationship: r.relationship,
+          gender: r.gender,
+          date_of_birth: r.date_of_birth,
+          age_group: r.age_group,
+          email: r.email,
+          phone: r.phone,
+          passport_number: r.passport_number,
+          passport_expiry: r.passport_expiry,
+          nationality: r.nationality,
+          dietary_preference: r.dietary_preference,
+          notes: r.notes,
+          created_at: String(r.created_at),
+          updated_at: String(r.updated_at),
+        }));
+      }
+    } catch {
+      familyMembers = [];
+    }
+
     return {
       contact,
+      familyMembers,
       itineraries: itnRes.rows.map((r) => ({
         id: String(r.id),
         reference_no: String(r.reference_no || r.id),
@@ -420,18 +459,27 @@ export class ContactService {
     const isPaid = !!params.isPaid;
     const now = new Date().toISOString();
 
-    // Check for existing contact by last10 digits or email
-    let findSql = `SELECT * FROM contacts WHERE phone_clean LIKE ?`;
-    const findArgs: (string | number)[] = [`%${last10}%`];
-    if (params.email && params.email.trim()) {
-      findSql += ` OR email = ?`;
-      findArgs.push(params.email.trim());
-    }
+    const hasValidPhone = Boolean(last10 && last10.length >= 8);
+    const hasValidEmail = Boolean(params.email && params.email.trim().includes("@"));
 
-    const existingRes = await db.execute({
-      sql: findSql,
-      args: findArgs,
-    });
+    let existingRes = { rows: [] as unknown[] };
+
+    if (hasValidPhone && hasValidEmail) {
+      existingRes = await db.execute({
+        sql: `SELECT * FROM contacts WHERE phone_clean LIKE ? OR LOWER(email) = ? LIMIT 1`,
+        args: [`%${last10}%`, params.email!.trim().toLowerCase()],
+      });
+    } else if (hasValidPhone) {
+      existingRes = await db.execute({
+        sql: `SELECT * FROM contacts WHERE phone_clean LIKE ? LIMIT 1`,
+        args: [`%${last10}%`],
+      });
+    } else if (hasValidEmail) {
+      existingRes = await db.execute({
+        sql: `SELECT * FROM contacts WHERE LOWER(email) = ? LIMIT 1`,
+        args: [params.email!.trim().toLowerCase()],
+      });
+    }
 
     if (existingRes.rows.length > 0) {
       const contact = parseContactRow(existingRes.rows[0] as Record<string, unknown>);

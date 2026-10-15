@@ -6,6 +6,8 @@ function mapRowToBooking(row: Record<string, unknown>): Booking {
     id: String(row.id),
     tour_id: row.tour_id ? String(row.tour_id) : null,
     tour_title: row.tour_title ? String(row.tour_title) : undefined,
+    user_id: row.user_id ? String(row.user_id) : null,
+    family_member_id: row.family_member_id ? String(row.family_member_id) : null,
     customer_name: String(row.customer_name),
     customer_email: String(row.customer_email),
     customer_phone: String(row.customer_phone),
@@ -47,11 +49,13 @@ export class BookingRepository {
     const now = new Date().toISOString();
 
     await db.execute({
-      sql: `INSERT INTO bookings (id, tour_id, customer_name, customer_email, customer_phone, travel_date, travelers_count, special_requests, status, total_amount, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      sql: `INSERT INTO bookings (id, tour_id, user_id, family_member_id, customer_name, customer_email, customer_phone, travel_date, travelers_count, special_requests, status, total_amount, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id,
         data.tour_id ?? null,
+        data.user_id ?? null,
+        data.family_member_id ?? null,
         data.customer_name ?? "",
         data.customer_email ?? "",
         data.customer_phone ?? "",

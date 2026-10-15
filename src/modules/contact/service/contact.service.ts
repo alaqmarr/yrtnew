@@ -14,7 +14,25 @@ export class ContactService {
     if (!data.name || !data.email || !data.message) {
       throw new Error("Name, email and message are required");
     }
-    return contactRepository.create(data);
+    const created = await contactRepository.create(data);
+
+    // Automatically record / update customer profile in Unified Contacts CRM
+    try {
+      const { contactService: crmContactService } = await import("@/modules/contacts/service/contact.service");
+      await crmContactService.recordCustomerActivity({
+        name: data.name,
+        phone: data.phone || "",
+        email: data.email,
+        amount: 0,
+        isPaid: false,
+        source: "Contact Form Message",
+        notes: `Subject: ${data.subject || "General Inquiry"}`,
+      });
+    } catch (crmErr) {
+      console.warn("Auto-sync contact for message non-fatal error:", crmErr);
+    }
+
+    return created;
   }
 
   async updateStatus(id: string, status: ContactMessage["status"]): Promise<ContactMessage> {

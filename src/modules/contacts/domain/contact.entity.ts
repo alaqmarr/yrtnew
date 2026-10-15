@@ -32,8 +32,11 @@ export interface Contact {
   updated_at: string;
 }
 
+import { FamilyMember } from "@/modules/family/domain/family.entity";
+
 export interface CustomerActivitySummary {
   contact: Contact;
+  familyMembers?: FamilyMember[];
   itineraries: Array<{
     id: string;
     reference_no: string;

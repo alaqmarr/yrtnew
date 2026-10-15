@@ -5,6 +5,7 @@ import { Itinerary } from "@/modules/itineraries/domain/itinerary.entity";
 import { Invoice } from "@/modules/invoices/domain/invoice.entity";
 import { GalleryItem } from "@/modules/gallery/domain/gallery.entity";
 import { SupportTicket } from "./ticket.entity";
+import { FamilyMember } from "@/modules/family/domain/family.entity";
 
 export interface ClientProfile {
   id: string;
@@ -12,10 +13,20 @@ export interface ClientProfile {
   email: string;
   phone: string;
   role: string;
+  family_head_id?: string | null;
+  relationship_to_head?: string | null;
 }
 
 export interface ClientDashboardData {
   profile: ClientProfile;
+  isFamilyHead: boolean;
+  familyHead?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string | null;
+  } | null;
+  familyMembers: FamilyMember[];
   bookings: Booking[];
   flights: FlightInquiry[];
   paymentLinks: PaymentLink[];
@@ -30,5 +41,6 @@ export interface ClientDashboardData {
     openTickets: number;
     savedFavorites: number;
     totalItineraries?: number;
+    totalFamilyMembers?: number;
   };
 }

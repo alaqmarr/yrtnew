@@ -1,6 +1,8 @@
 export interface FlightInquiry {
   id: string;
   trip_type: "roundtrip" | "oneway" | "multicity";
+  user_id?: string | null;
+  family_member_id?: string | null;
   from_city: string;
   to_city: string;
   depart_date: string;
@@ -20,6 +22,8 @@ export interface FlightInquiry {
 
 export interface CreateFlightInquiryDto {
   trip_type: "roundtrip" | "oneway" | "multicity";
+  user_id?: string | null;
+  family_member_id?: string | null;
   from_city: string;
   to_city: string;
   depart_date: string;

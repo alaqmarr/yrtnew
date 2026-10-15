@@ -2,6 +2,8 @@ export interface Booking {
   id: string;
   tour_id: string | null;
   tour_title?: string;
+  user_id?: string | null;
+  family_member_id?: string | null;
   customer_name: string;
   customer_email: string;
   customer_phone: string;
@@ -16,6 +18,8 @@ export interface Booking {
 
 export interface CreateBookingDto {
   tour_id?: string | null;
+  user_id?: string | null;
+  family_member_id?: string | null;
   customer_name: string;
   customer_email: string;
   customer_phone: string;

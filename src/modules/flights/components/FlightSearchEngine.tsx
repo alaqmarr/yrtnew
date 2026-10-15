@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Plane, Calendar, Users, ArrowRightLeft, CheckCircle2, Sparkles, ShieldCheck } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { Plane, Calendar, Users, ArrowRightLeft, CheckCircle2, Sparkles, ShieldCheck, UserCheck } from "lucide-react";
 import WhatsAppIcon from "@/shared/components/WhatsAppIcon";
 
 export default function FlightSearchEngine() {
+  const { data: session } = useSession();
   const [tripType, setTripType] = useState<"roundtrip" | "oneway" | "multicity">("roundtrip");
   const [fromCity, setFromCity] = useState("Hyderabad (HYD)");
   const [toCity, setToCity] = useState("Dubai (DXB)");
@@ -19,9 +21,49 @@ export default function FlightSearchEngine() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [notes, setNotes] = useState("");
 
+  const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+  const [selectedMemberId, setSelectedMemberId] = useState<string>("self");
+  const [familyMemberId, setFamilyMemberId] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (session?.user) {
+      setCustomerName((prev) => prev || session.user.name || "");
+      setCustomerEmail((prev) => prev || session.user.email || "");
+      setCustomerPhone((prev) => prev || session.user.phone || "");
+
+      // Fetch family members
+      fetch("/api/account/family")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!data) return;
+          const membersList = Array.isArray(data) ? data : Array.isArray(data.members) ? data.members : [];
+          setFamilyMembers(membersList);
+        })
+        .catch(() => {});
+    }
+  }, [session]);
+
+  const handleSelectTraveler = (choice: string) => {
+    setSelectedMemberId(choice);
+    if (choice === "self") {
+      setCustomerName(session?.user?.name || "");
+      setCustomerEmail(session?.user?.email || "");
+      setCustomerPhone(session?.user?.phone || "");
+      setFamilyMemberId(null);
+    } else {
+      const member = familyMembers.find((m) => m.id === choice);
+      if (member) {
+        setCustomerName(member.name);
+        setCustomerEmail(member.email || session?.user?.email || "");
+        setCustomerPhone(member.phone || session?.user?.phone || "");
+        setFamilyMemberId(member.id);
+      }
+    }
+  };
 
   const swapCities = () => {
     const temp = fromCity;
@@ -52,6 +94,7 @@ export default function FlightSearchEngine() {
           customer_name: customerName,
           customer_email: customerEmail,
           customer_phone: customerPhone,
+          family_member_id: familyMemberId || null,
           notes: notes || null,
         }),
       });
@@ -261,9 +304,37 @@ export default function FlightSearchEngine() {
 
           {/* Contact Details */}
           <div className="pt-2 border-t border-slate-100">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">
-              Where should we send the flight quote?
-            </span>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Where should we send the flight quote?
+              </span>
+              {session?.user && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 border border-amber-200 text-amber-800">
+                  <UserCheck className="w-3 h-3 text-amber-600" />
+                  <span>Prefilled for {session.user.name}</span>
+                </span>
+              )}
+            </div>
+
+            {familyMembers.length > 0 && (
+              <div className="mb-3 p-3 bg-amber-50/70 border border-amber-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-amber-900">Booking Flight For:</span>
+                </div>
+                <select
+                  value={selectedMemberId}
+                  onChange={(e) => handleSelectTraveler(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl border border-amber-300 text-xs font-semibold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="self">Primary Account ({session?.user?.name || "Self"})</option>
+                  {familyMembers.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({m.relationship})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">

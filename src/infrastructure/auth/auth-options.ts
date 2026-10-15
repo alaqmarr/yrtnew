@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const result = await db.execute({
-            sql: "SELECT id, email, password_hash, name, phone, role, department, branch_id, is_active FROM users WHERE email = ? LIMIT 1",
+            sql: "SELECT id, email, password_hash, name, phone, role, department, branch_id, is_active, family_head_id, relationship_to_head FROM users WHERE email = ? LIMIT 1",
             args: [credentials.email.trim().toLowerCase()],
           });
 
@@ -50,6 +50,8 @@ export const authOptions: NextAuthOptions = {
             role: String(user.role),
             department: user.department ? String(user.department) : null,
             branch_id: user.branch_id ? String(user.branch_id) : null,
+            family_head_id: user.family_head_id ? String(user.family_head_id) : null,
+            relationship_to_head: user.relationship_to_head ? String(user.relationship_to_head) : null,
           };
         } catch (error) {
           console.error("Auth authorize error:", error);
@@ -73,6 +75,8 @@ export const authOptions: NextAuthOptions = {
         token.phone = user.phone;
         token.department = user.department;
         token.branch_id = user.branch_id;
+        token.family_head_id = user.family_head_id;
+        token.relationship_to_head = user.relationship_to_head;
       }
       return token;
     },
@@ -83,6 +87,8 @@ export const authOptions: NextAuthOptions = {
         session.user.phone = token.phone as string | null;
         session.user.department = token.department as string | null;
         session.user.branch_id = token.branch_id as string | null;
+        session.user.family_head_id = token.family_head_id as string | null;
+        session.user.relationship_to_head = token.relationship_to_head as string | null;
       }
       return session;
     },

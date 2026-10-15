@@ -9,8 +9,11 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'client',
   department TEXT,
   branch_id TEXT,
+  family_head_id TEXT,
+  relationship_to_head TEXT,
   is_active INTEGER NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (family_head_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS destinations (
@@ -215,6 +218,8 @@ CREATE TABLE IF NOT EXISTS team_members (
 
 CREATE TABLE IF NOT EXISTS bookings (
   id TEXT PRIMARY KEY,
+  user_id TEXT,
+  family_member_id TEXT,
   tour_id TEXT,
   customer_name TEXT NOT NULL,
   customer_email TEXT NOT NULL,
@@ -226,11 +231,15 @@ CREATE TABLE IF NOT EXISTS bookings (
   total_amount REAL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE SET NULL
+  FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE SET NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (family_member_id) REFERENCES family_members (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS flight_inquiries (
   id TEXT PRIMARY KEY,
+  user_id TEXT,
+  family_member_id TEXT,
   trip_type TEXT NOT NULL DEFAULT 'roundtrip',
   from_city TEXT NOT NULL,
   to_city TEXT NOT NULL,
@@ -246,7 +255,10 @@ CREATE TABLE IF NOT EXISTS flight_inquiries (
   customer_phone TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new',
   notes TEXT,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (family_member_id) REFERENCES family_members (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS contact_messages (
@@ -318,6 +330,33 @@ CREATE TABLE IF NOT EXISTS contacts (
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS family_members (
+  id TEXT PRIMARY KEY,
+  primary_user_id TEXT NOT NULL,
+  member_user_id TEXT,
+  name TEXT NOT NULL,
+  relationship TEXT NOT NULL DEFAULT 'Spouse',
+  gender TEXT,
+  date_of_birth TEXT,
+  age_group TEXT NOT NULL DEFAULT 'Adult',
+  email TEXT,
+  phone TEXT,
+  passport_number TEXT,
+  passport_expiry TEXT,
+  nationality TEXT DEFAULT 'Indian',
+  dietary_preference TEXT DEFAULT 'Any',
+  notes TEXT,
+  can_login INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (primary_user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (member_user_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_family_members_primary ON family_members (primary_user_id);
+CREATE INDEX IF NOT EXISTS idx_family_members_user ON family_members (member_user_id);
+CREATE INDEX IF NOT EXISTS idx_family_members_email ON family_members (email);
+
 CREATE INDEX IF NOT EXISTS idx_tours_destination ON tours (destination_id);
 CREATE INDEX IF NOT EXISTS idx_tours_featured ON tours (featured);
 CREATE INDEX IF NOT EXISTS idx_destinations_featured ON destinations (is_featured);
@@ -334,6 +373,8 @@ CREATE INDEX IF NOT EXISTS idx_branches_intl ON branches (is_international);
 CREATE INDEX IF NOT EXISTS idx_payment_links_code ON payment_links (link_code);
 CREATE INDEX IF NOT EXISTS idx_itineraries_ref ON itineraries (reference_no);
 CREATE INDEX IF NOT EXISTS idx_itineraries_user ON itineraries (user_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings (user_id);
+CREATE INDEX IF NOT EXISTS idx_flight_inquiries_user ON flight_inquiries (user_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_num ON invoices (invoice_number);
 CREATE INDEX IF NOT EXISTS idx_contacts_phone_clean ON contacts (phone_clean);
 CREATE INDEX IF NOT EXISTS idx_contacts_name ON contacts (name);

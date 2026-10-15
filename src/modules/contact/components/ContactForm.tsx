@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Send, CheckCircle2, Phone } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { Send, CheckCircle2, Phone, UserCheck } from "lucide-react";
 import WhatsAppIcon from "@/shared/components/WhatsAppIcon";
 
 interface BranchOption {
@@ -15,6 +16,7 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ branches }: ContactFormProps) {
+  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,6 +29,17 @@ export default function ContactForm({ branches }: ContactFormProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (session?.user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || session.user.name || "",
+        email: prev.email || session.user.email || "",
+        phone: prev.phone || session.user.phone || "",
+      }));
+    }
+  }, [session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +118,15 @@ export default function ContactForm({ branches }: ContactFormProps) {
               Fill in your details below and our branch expert will contact you.
             </p>
           </div>
+
+          {session?.user && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-medium">
+              <UserCheck className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                Prefilled for <strong>{session.user.name}</strong> • Connected to your client profile
+              </span>
+            </div>
+          )}
 
           {error && (
             <div className="p-3 text-xs bg-rose-50 text-rose-600 rounded-xl border border-rose-100">

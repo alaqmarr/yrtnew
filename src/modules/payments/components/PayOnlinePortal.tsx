@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import RazorpayCheckoutButton from "./RazorpayCheckoutButton";
 import PrintReceiptButton from "./PrintReceiptButton";
 import WhatsAppIcon from "@/shared/components/WhatsAppIcon";
@@ -16,14 +17,17 @@ import {
   ArrowRight,
   PhoneCall,
   FileCheck,
+  UserCheck,
 } from "lucide-react";
 
 interface PayOnlinePortalProps {
   isTest?: boolean;
 }
 
-export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps) {
+function PayOnlinePortalInner({ isTest = false }: PayOnlinePortalProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<"custom" | "code">("custom");
 
   // Custom Payment Form State
@@ -35,6 +39,33 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
   const [reference, setReference] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // URL search params prefill (e.g. from invoices or quick payment links)
+  const paramRef = searchParams.get("ref");
+  const paramAmount = searchParams.get("amount");
+  const paramName = searchParams.get("name");
+  const paramPhone = searchParams.get("phone");
+  const paramEmail = searchParams.get("email");
+  const paramPurpose = searchParams.get("purpose");
+
+  useEffect(() => {
+    if (paramRef) setReference(paramRef);
+    if (paramAmount && !isNaN(Number(paramAmount))) setAmount(Number(paramAmount));
+    if (paramName) setCustomerName(paramName);
+    if (paramPhone) setCustomerPhone(paramPhone);
+    if (paramEmail) setCustomerEmail(paramEmail);
+    if (paramPurpose) setPurpose(paramPurpose);
+  }, [paramRef, paramAmount, paramName, paramPhone, paramEmail, paramPurpose]);
+
+  useEffect(() => {
+    if (session?.user) {
+      setCustomerName((prev) => prev || session.user.name || "");
+      setCustomerEmail((prev) => prev || session.user.email || "");
+      setCustomerPhone((prev) =>
+        prev && prev !== "+91 " ? prev : session.user.phone || "+91 "
+      );
+    }
+  }, [session]);
+
   // Code Search State
   const [lookupCode, setLookupCode] = useState("");
 
@@ -42,6 +73,7 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
   const [paidDetails, setPaidDetails] = useState<{
     paymentId: string;
     orderId: string;
+    linkCode: string;
     amount: number;
     purpose: string;
     date: string;
@@ -64,10 +96,17 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
     }
   };
 
-  const handleSuccess = (details: { paymentId: string; orderId: string }) => {
+  const handleSuccess = (details: {
+    paymentId: string;
+    orderId: string;
+    linkCode?: string;
+  }) => {
+    const code =
+      details.linkCode || `PAY-${details.paymentId.slice(-6).toUpperCase()}`;
     setPaidDetails({
       paymentId: details.paymentId,
       orderId: details.orderId,
+      linkCode: code,
       amount: amount,
       purpose: purpose + (reference ? ` (Ref: ${reference})` : ""),
       date: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
@@ -117,7 +156,7 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <PrintReceiptButton
             receiptData={{
-              linkCode: `PAY-${paidDetails.paymentId.slice(-6).toUpperCase()}`,
+              linkCode: paidDetails.linkCode,
               customerName: customerName || "Valued Traveler",
               customerPhone: customerPhone || undefined,
               customerEmail: customerEmail || undefined,
@@ -130,6 +169,16 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
             className="px-5 py-3 rounded-xl text-xs font-bold text-slate-800 bg-amber-400 hover:bg-amber-300 transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
             buttonText="Print Official Receipt"
           />
+
+          <a
+            href={`/receipt/${paidDetails.linkCode}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-3 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+          >
+            <FileCheck className="w-4 h-4 text-emerald-600" />
+            <span>View Receipt</span>
+          </a>
 
           <a
             href={`https://wa.me/919100228152?text=Hi%20Yellow%20Ribbon%20Travels,%20I%20have%20completed%20online%20payment%20of%20₹${paidDetails.amount}%20with%20Payment%20ID:%20${paidDetails.paymentId}.`}
@@ -339,6 +388,16 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
                 </select>
               </div>
 
+              {/* Customer Details */}
+              {session?.user && (
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-medium">
+                  <UserCheck className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    Prefilled for <strong>{session.user.name}</strong> • Payment receipt will be linked to your client dashboard
+                  </span>
+                </div>
+              )}
+
               {/* Customer Name & WhatsApp Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -488,3 +547,18 @@ export default function PayOnlinePortal({ isTest = false }: PayOnlinePortalProps
     </div>
   );
 }
+
+export default function PayOnlinePortal(props: PayOnlinePortalProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full max-w-6xl mx-auto py-12 text-center text-slate-400 text-sm">
+          Loading secure payment portal...
+        </div>
+      }
+    >
+      <PayOnlinePortalInner {...props} />
+    </Suspense>
+  );
+}
+

@@ -44,7 +44,10 @@ export class SiteSettingRepository {
     await db.execute({
       sql: `INSERT INTO site_settings (key, value, group_name, updated_at)
             VALUES (?, ?, ?, ?)
-            ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+            ON CONFLICT(key) DO UPDATE SET 
+              value = excluded.value, 
+              group_name = CASE WHEN excluded.group_name != 'general' THEN excluded.group_name ELSE site_settings.group_name END,
+              updated_at = excluded.updated_at`,
       args: [key, value, groupName, now],
     });
   }

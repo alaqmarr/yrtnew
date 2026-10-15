@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { reviewService } from "@/modules/reviews/service/review.service";
 
 export async function GET(req: NextRequest) {
@@ -10,10 +9,8 @@ export async function GET(req: NextRequest) {
     const minRating = searchParams.get("minRating") ? Number(searchParams.get("minRating")) : undefined;
 
     if (all) {
-      const session = await getServerSession(authOptions);
-      if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+      const { errorResponse } = await requireStaffOrAdmin();
+      if (errorResponse) return errorResponse;
       const reviews = await reviewService.getAllReviews();
       return NextResponse.json(reviews);
     }
@@ -33,10 +30,8 @@ export async function POST(req: NextRequest) {
 
     // Check if it's a sync request from admin
     if (body.action === "sync-google") {
-      const session = await getServerSession(authOptions);
-      if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+      const { errorResponse } = await requireStaffOrAdmin();
+      if (errorResponse) return errorResponse;
       const result = await reviewService.syncGoogleReviews();
       return NextResponse.json(result);
     }

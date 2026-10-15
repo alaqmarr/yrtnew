@@ -89,8 +89,8 @@ export class ItineraryService {
 
   async createItinerary(data: CreateItineraryDto): Promise<Itinerary> {
     const year = new Date().getFullYear();
-    const randomNum = Math.floor(100 + Math.random() * 900);
-    const refNo = `YRT-ITN-${year}-${randomNum}`;
+    const entropy = `${Date.now().toString(36).slice(-4)}${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
+    const refNo = `YRT-ITN-${year}-${entropy}`;
 
     let userId = data.user_id;
     try {

@@ -63,31 +63,28 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/30 to-black/70 -z-10" />
 
         {/* Content Container */}
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 pt-16 sm:pt-20 pb-10 sm:pb-14 flex flex-col items-center justify-center text-center space-y-6 sm:space-y-8 z-10">
+        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 pt-12 sm:pt-20 pb-8 sm:pb-14 flex flex-col items-center justify-center text-center space-y-5 sm:space-y-8 z-10">
           {/* Top Pill Badge */}
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-amber-300 text-xs sm:text-sm font-bold shadow-lg">
-            <Sparkles className="w-4 h-4 text-amber-300 animate-spin [animation-duration:8s]" />
-            <span>Bespoke Holidays • Wholesale Flights • Global Branches</span>
+          <div className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-amber-300 text-[11px] sm:text-sm font-bold shadow-lg max-w-[95vw] sm:max-w-none text-center">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 shrink-0 animate-spin [animation-duration:8s]" />
+            <span className="truncate">Bespoke Holidays • Wholesale Flights • Global Branches</span>
           </div>
 
           {/* Centered Grand Cursive Brand Title */}
-          <div className="space-y-4 max-w-5xl mx-auto">
-            <h1 className="font-cursive text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-amber-300 font-normal tracking-wide drop-shadow-[0_12px_32px_rgba(0,0,0,0.9)] leading-tight select-none">
+          <div className="space-y-3 sm:space-y-4 max-w-5xl mx-auto px-2">
+            <h1 className="font-cursive text-5xl sm:text-7xl md:text-8xl lg:text-9xl text-amber-300 font-normal tracking-wide drop-shadow-[0_12px_32px_rgba(0,0,0,0.9)] leading-tight select-none">
               Yellow Ribbon Travels
             </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+            <p className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
               Curating Extraordinary Journeys Around The World
-            </p>
-            <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-3xl mx-auto leading-relaxed font-normal pt-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-              Secunderabad HQ • Branches in Chennai, Pune, Dahod & Patna • Global Offices in Dubai, London & Singapore. Handcrafted itineraries, 24/7 dedicated travel concierge, and wholesale IATA airfares.
             </p>
           </div>
 
           {/* CTA Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 pt-1 sm:pt-2 w-full max-w-2xl px-2">
             <Link
               href="/tours"
-              className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:brightness-105 shadow-xl shadow-amber-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+              className="w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 hover:brightness-105 shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
             >
               <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950" />
               <span>Explore Tour Packages</span>
@@ -96,7 +93,7 @@ export default async function HomePage() {
 
             <Link
               href="/flight-bookings"
-              className="px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 shadow-lg transition-all flex items-center gap-2"
+              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 shadow-lg transition-all flex items-center justify-center gap-2"
             >
               <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-300 rotate-45" />
               <span>Flight Desk</span>
@@ -104,7 +101,7 @@ export default async function HomePage() {
 
             <Link
               href="/pay"
-              className="px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-bold text-white bg-cyan-600/80 hover:bg-cyan-600 backdrop-blur-md border border-cyan-400/40 shadow-lg shadow-cyan-600/25 transition-all flex items-center gap-2"
+              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-cyan-600/80 hover:bg-cyan-600 backdrop-blur-md border border-cyan-400/40 shadow-lg shadow-cyan-600/25 transition-all flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
               <span>Pay Online</span>
@@ -114,31 +111,11 @@ export default async function HomePage() {
               href="https://wa.me/919100228152?text=Hi%20Yellow%20Ribbon%20Travels,%20I%20would%20like%20to%20plan%20a%20holiday%20trip!"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-bold text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-xl shadow-emerald-600/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+              className="px-5 sm:px-7 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
             >
               <WhatsAppIcon className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
               <span>WhatsApp Us</span>
             </a>
-          </div>
-
-          {/* Trust Highlights Strip */}
-          <div className="pt-6 sm:pt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold text-slate-200">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/15">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span>4.9★ Google Rated (480+ Reviews)</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/15">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>100% Private Guided Cars</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/15">
-              <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-              <span>Razorpay Verified Gateway</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/15">
-              <CheckCircle2 className="w-4 h-4 text-rose-400" />
-              <span>Zero Hidden Charges</span>
-            </div>
           </div>
         </div>
       </section>
@@ -148,41 +125,41 @@ export default async function HomePage() {
         {/* Subtle Brand Ribbon Highlight Bar Top */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-yellow via-brand-green via-brand-cyan to-brand-coral opacity-90" />
 
-        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4 text-center">
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-amber-200/50 shadow-xs sm:shadow-none">
-            <div className="text-3xl xl:text-4xl font-black text-amber-600 tracking-tight">15,000+</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">Happy Travelers</div>
-            <div className="text-[10px] font-semibold text-amber-700/80">★ Verified Journeys</div>
+        <div className="w-full max-w-[1920px] 2xl:max-w-[2160px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 2xl:px-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4 text-center">
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-amber-200/50 shadow-xs sm:shadow-none">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-amber-600 tracking-tight">15,000+</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Happy Travelers</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-amber-700/80">★ Verified Journeys</div>
           </div>
 
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-cyan-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
-            <div className="text-3xl xl:text-4xl font-black text-cyan-600 tracking-tight">50+</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">World Destinations</div>
-            <div className="text-[10px] font-semibold text-cyan-700/80">Domestic & Global</div>
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-cyan-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-cyan-600 tracking-tight">50+</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Destinations</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-cyan-700/80">Domestic & Global</div>
           </div>
 
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-amber-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
-            <div className="text-3xl xl:text-4xl font-black text-amber-500 tracking-tight">4.9 ★</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">Google Rating</div>
-            <div className="text-[10px] font-semibold text-amber-700/80">480+ Real Reviews</div>
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-amber-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-amber-500 tracking-tight">4.9 ★</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Google Rating</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-amber-700/80">480+ Real Reviews</div>
           </div>
 
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-rose-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
-            <div className="text-3xl xl:text-4xl font-black text-rose-600 tracking-tight">8+</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">Global Offices</div>
-            <div className="text-[10px] font-semibold text-rose-700/80">India, UAE, UK, Singapore</div>
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-rose-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-rose-600 tracking-tight">8+</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Global Offices</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-rose-700/80">India, UAE, UK, SG</div>
           </div>
 
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-emerald-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
-            <div className="text-3xl xl:text-4xl font-black text-emerald-600 tracking-tight">100%</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">Custom Itineraries</div>
-            <div className="text-[10px] font-semibold text-emerald-700/80">Tailor-Made Holidays</div>
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-emerald-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-emerald-600 tracking-tight">100%</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Custom Tours</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-emerald-700/80">Tailor-Made Holidays</div>
           </div>
 
-          <div className="space-y-1.5 p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-cyan-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
-            <div className="text-3xl xl:text-4xl font-black text-cyan-700 tracking-tight">24 / 7</div>
-            <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">Tour Concierge</div>
-            <div className="text-[10px] font-semibold text-cyan-800/80">WhatsApp Assistance</div>
+          <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-white/70 sm:bg-transparent border sm:border-0 border-cyan-200/50 shadow-xs sm:shadow-none sm:border-l sm:border-amber-200/60">
+            <div className="text-2xl sm:text-3xl xl:text-4xl font-black text-cyan-700 tracking-tight">24 / 7</div>
+            <div className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">Concierge</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-cyan-800/80">WhatsApp Assistance</div>
           </div>
         </div>
 

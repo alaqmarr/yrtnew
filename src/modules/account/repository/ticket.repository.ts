@@ -61,8 +61,9 @@ export class TicketRepository {
 
   async create(data: CreateTicketDto): Promise<SupportTicket> {
     const id = `tck_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const ticket_number = `YRT-TCK-${randomSuffix}`;
+    const year = new Date().getFullYear();
+    const entropy = `${Date.now().toString(36).slice(-4)}${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
+    const ticket_number = `YRT-TCK-${year}-${entropy}`;
     const now = new Date().toISOString();
 
     await db.execute({

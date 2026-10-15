@@ -32,6 +32,12 @@ export async function runSchemaMigration() {
     "ALTER TABLE branches ADD COLUMN country TEXT NOT NULL DEFAULT 'India'",
     "ALTER TABLE branches ADD COLUMN is_international INTEGER NOT NULL DEFAULT 0",
     "ALTER TABLE branches ADD COLUMN map_embed_url TEXT",
+    "ALTER TABLE users ADD COLUMN family_head_id TEXT",
+    "ALTER TABLE users ADD COLUMN relationship_to_head TEXT",
+    "ALTER TABLE bookings ADD COLUMN user_id TEXT",
+    "ALTER TABLE bookings ADD COLUMN family_member_id TEXT",
+    "ALTER TABLE flight_inquiries ADD COLUMN user_id TEXT",
+    "ALTER TABLE flight_inquiries ADD COLUMN family_member_id TEXT",
   ];
 
   for (const alterSql of safeAlters) {
@@ -56,4 +62,12 @@ async function main() {
   }
 }
 
-main();
+if (
+  typeof process !== "undefined" &&
+  process.argv &&
+  process.argv[1] &&
+  (process.argv[1].endsWith("migrate.ts") || process.argv[1].endsWith("migrate.js"))
+) {
+  main();
+}
+

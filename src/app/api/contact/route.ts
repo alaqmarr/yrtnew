@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/infrastructure/auth/auth-options";
+import { requireStaffOrAdmin } from "@/infrastructure/auth/guards";
 import { contactService } from "@/modules/contact/service/contact.service";
 import { branchService } from "@/modules/branches/service/branch.service";
 import { sendEmail } from "@/infrastructure/email/mailer";
@@ -8,10 +7,8 @@ import { siteSettingService } from "@/modules/site-settings/service/site-setting
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { errorResponse } = await requireStaffOrAdmin();
+    if (errorResponse) return errorResponse;
 
     const messages = await contactService.getAllMessages();
     return NextResponse.json(messages);

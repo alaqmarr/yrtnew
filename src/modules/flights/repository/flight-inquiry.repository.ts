@@ -5,6 +5,8 @@ function mapRowToFlightInquiry(row: Record<string, unknown>): FlightInquiry {
   return {
     id: String(row.id),
     trip_type: row.trip_type as FlightInquiry["trip_type"],
+    user_id: row.user_id ? String(row.user_id) : null,
+    family_member_id: row.family_member_id ? String(row.family_member_id) : null,
     from_city: String(row.from_city),
     to_city: String(row.to_city),
     depart_date: String(row.depart_date),
@@ -44,13 +46,15 @@ export class FlightInquiryRepository {
 
     await db.execute({
       sql: `INSERT INTO flight_inquiries (
-        id, trip_type, from_city, to_city, depart_date, return_date,
+        id, trip_type, user_id, family_member_id, from_city, to_city, depart_date, return_date,
         passengers_adults, passengers_children, passengers_infants,
         cabin_class, preferred_airline, customer_name, customer_email, customer_phone, status, notes, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id,
         data.trip_type ?? "roundtrip",
+        data.user_id ?? null,
+        data.family_member_id ?? null,
         data.from_city ?? "",
         data.to_city ?? "",
         data.depart_date ?? "",

@@ -21,6 +21,8 @@ import {
   CreditCard,
   Heart,
   LayoutDashboard,
+  Users,
+  FileText,
 } from "lucide-react";
 import WhatsAppIcon from "./WhatsAppIcon";
 
@@ -125,27 +127,27 @@ export default function Navbar() {
           : "bg-white/90 backdrop-blur-sm border-b border-slate-100"
       }`}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16">
-        <div className="flex items-center justify-between h-20 gap-4">
+      <div className="w-full px-3 sm:px-6 lg:px-10 xl:px-12 2xl:px-16">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden p-0.5 bg-gradient-to-tr from-brand-yellow via-brand-coral to-brand-cyan shadow-sm group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-white rounded-full p-1 flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0 min-w-0">
+            <div className="relative w-9 h-9 sm:w-12 sm:h-12 shrink-0 rounded-full overflow-hidden p-0.5 bg-gradient-to-tr from-brand-yellow via-brand-coral to-brand-cyan shadow-sm group-hover:scale-105 transition-transform">
+              <div className="w-full h-full bg-white rounded-full p-0.5 sm:p-1 flex items-center justify-center">
                 <Image
                   src="/logo.png"
                   alt="Yellow Ribbon Travels"
                   width={44}
                   height={44}
-                  className="object-contain"
+                  className="object-contain w-7 h-7 sm:w-10 sm:h-10"
                   priority
                 />
               </div>
             </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors">
+            <div className="flex flex-col min-w-0">
+              <span className="font-extrabold text-base sm:text-xl tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors truncate">
                 YELLOW RIBBON
               </span>
-              <span className="text-[10px] tracking-widest uppercase font-semibold text-slate-500 flex items-center gap-1">
+              <span className="text-[8px] sm:text-[10px] tracking-wider sm:tracking-widest uppercase font-semibold text-slate-500 flex items-center gap-1">
                 TRAVELS & TOURS <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-ping" />
               </span>
             </div>
@@ -289,7 +291,16 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        href="/account"
+                        href="/account?tab=family"
+                        onClick={() => setUserDropdown(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
+                      >
+                        <Users className="w-4 h-4 text-amber-600" />
+                        <span>My Family & Members</span>
+                      </Link>
+
+                      <Link
+                        href="/account?tab=bookings"
                         onClick={() => setUserDropdown(false)}
                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
                       >
@@ -298,7 +309,16 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        href="/account"
+                        href="/account?tab=itineraries"
+                        onClick={() => setUserDropdown(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
+                      >
+                        <FileText className="w-4 h-4 text-cyan-500" />
+                        <span>Custom Itineraries</span>
+                      </Link>
+
+                      <Link
+                        href="/account?tab=payments"
                         onClick={() => setUserDropdown(false)}
                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
                       >
@@ -307,7 +327,7 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        href="/account"
+                        href="/account?tab=tickets"
                         onClick={() => setUserDropdown(false)}
                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
                       >
@@ -316,12 +336,12 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        href="/account"
+                        href="/account?tab=favorites"
                         onClick={() => setUserDropdown(false)}
                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl"
                       >
                         <Heart className="w-4 h-4 text-rose-500" />
-                        <span>Saved Favorites</span>
+                        <span>Saved Wishlist</span>
                       </Link>
 
                       {isAdmin && (
@@ -391,10 +411,10 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
             <Link
               href="/account"
-              className="p-2 text-slate-700 bg-slate-100 rounded-full"
+              className="p-1.5 sm:p-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
               title="Client Portal"
             >
               <User className="w-4 h-4" />
@@ -403,7 +423,7 @@ export default function Navbar() {
               href="https://wa.me/919100228152?text=Hi%20Yellow%20Ribbon%20Travels"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-white bg-[#25D366] hover:bg-[#20bd5a] rounded-full"
+              className="p-1.5 sm:p-2 text-white bg-[#25D366] hover:bg-[#20bd5a] rounded-full transition-colors"
               title="Chat on WhatsApp"
               aria-label="Chat on WhatsApp"
             >
@@ -411,10 +431,10 @@ export default function Navbar() {
             </a>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none"
+              className="p-1.5 sm:p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none transition-colors"
               aria-label="Toggle Navigation Menu"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
