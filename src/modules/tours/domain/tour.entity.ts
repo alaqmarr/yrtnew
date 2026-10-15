@@ -2,6 +2,9 @@ export interface ItineraryDay {
   day: number;
   title: string;
   description: string;
+  overnight?: string;
+  meals?: string;
+  visit_points?: string[];
 }
 
 export interface Tour {
