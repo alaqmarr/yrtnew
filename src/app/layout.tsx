@@ -119,6 +119,11 @@ export default async function RootLayout({
     >
       <head>
         <JsonLdSchema />
+        <script
+          defer
+          src="https://rsl.alaqmar.dev/t.js"
+          data-client="cli_01M5097SAH26DX9400N6WSYY1Q"
+        ></script>
       </head>
       <body className="antialiased min-h-screen flex flex-col bg-gradient-to-br from-amber-50/50 via-white to-cyan-50/45 text-slate-900 selection:bg-amber-100 selection:text-amber-900 font-sans">
         <AuthProvider>{children}</AuthProvider>

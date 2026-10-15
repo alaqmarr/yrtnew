@@ -26,6 +26,7 @@ import {
   FileText,
   Receipt,
   LifeBuoy,
+  Server,
 } from "lucide-react";
 
 export const revalidate = 0; // Always fresh in admin
@@ -118,6 +119,14 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/admin/rsl-server"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-blue-900 bg-blue-100 hover:bg-blue-200 transition-colors"
+          >
+            <Server className="w-4 h-4 text-blue-700" />
+            <span>RSL Server</span>
+          </Link>
+
           <Link
             href="/admin/tours"
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
