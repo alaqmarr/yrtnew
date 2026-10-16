@@ -273,6 +273,197 @@ export const RSL_WIDGET_CATALOG: RslWidgetSpec[] = [
   },
 ];
 
+const RSL_CUSTOM_WIDGET_TAGS = [
+  "due-banner",
+  "billing-summary",
+  "next-due-countdown",
+  "invoice-list",
+  "invoice-history",
+  "invoice-detail",
+  "payment-history",
+  "contract-card",
+  "server-overview",
+  "server-status",
+  "process-list",
+  "process-card",
+  "process-logs",
+  "metrics-chart",
+  "uptime-bars",
+  "uptime-badge",
+  "domain-status",
+  "ssl-badge",
+  "ssl-expiry",
+  "incident-feed",
+  "support-widget",
+  "ticket-widget",
+  "ticket-desk",
+  "ticket-list",
+  "ticket-thread",
+  "sla-badge",
+  "vault-secret",
+  "analytics-overview",
+  "analytics-chart",
+  "pageviews-chart",
+  "pageview-chart",
+  "traffic-chart",
+  "visitor-journeys",
+  "visitor-split",
+  "top-pages",
+  "web-vitals",
+  "releases-list",
+  "release-list",
+  "status-page",
+  "client-dashboard",
+];
+
+function ensureRslWebComponentsRegistered() {
+  if (typeof window === "undefined" || typeof customElements === "undefined") {
+    return;
+  }
+
+  const createWidgetClass = (fixedWidgetName: string) => {
+    return class RslCustomWidgetElement extends HTMLElement {
+      iframeEl: HTMLIFrameElement | null = null;
+      shadow: ShadowRoot;
+
+      static get observedAttributes() {
+        return [
+          "widget",
+          "data-widget",
+          "api-key",
+          "data-api-key",
+          "key",
+          "data-key",
+          "token",
+          "data-token",
+          "client-id",
+          "client",
+          "data-client",
+          "data-client-id",
+          "theme",
+          "accent",
+          "endpoint",
+          "height",
+        ];
+      }
+
+      constructor() {
+        super();
+        this.shadow = this.attachShadow({ mode: "open" });
+      }
+
+      connectedCallback() {
+        this.render();
+      }
+
+      attributeChangedCallback(
+        _name: string,
+        oldVal: string | null,
+        newVal: string | null
+      ) {
+        if (oldVal !== newVal && this.isConnected) {
+          this.render();
+        }
+      }
+
+      render() {
+        const widgetName =
+          fixedWidgetName ||
+          this.getAttribute("widget") ||
+          this.getAttribute("data-widget") ||
+          "client-dashboard";
+
+        const apiKey =
+          this.getAttribute("api-key") ||
+          this.getAttribute("data-api-key") ||
+          this.getAttribute("key") ||
+          this.getAttribute("data-key") ||
+          DEFAULT_RSL_API_KEY;
+
+        const clientId =
+          this.getAttribute("client-id") ||
+          this.getAttribute("client") ||
+          this.getAttribute("data-client") ||
+          this.getAttribute("data-client-id") ||
+          DEFAULT_RSL_CLIENT_ID;
+
+        const theme = this.getAttribute("theme") || "light";
+        const accent = this.getAttribute("accent") || "#2563eb";
+        const explicitHeight = this.getAttribute("height") || "260px";
+        const endpoint = (
+          this.getAttribute("endpoint") ||
+          this.getAttribute("data-endpoint") ||
+          DEFAULT_RSL_BASE_URL
+        ).replace(/\/+$/, "");
+
+        const isDark = theme !== "light";
+        const params = new URLSearchParams();
+        if (apiKey) params.set("apiKey", apiKey);
+        if (clientId) params.set("clientId", clientId);
+        if (theme) params.set("theme", theme);
+        if (accent) params.set("accent", accent);
+
+        const src = `${endpoint}/embed/${encodeURIComponent(
+          widgetName
+        )}?${params.toString()}`;
+
+        this.shadow.innerHTML =
+          `<style>` +
+          `:host{display:block;width:100%;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;color-scheme:${
+            isDark ? "dark" : "light"
+          };}` +
+          `iframe{width:100%;height:${explicitHeight};border:none;border-radius:16px;background:transparent;display:block;overflow:hidden;transition:height 0.12s ease-out;}` +
+          `</style>` +
+          `<iframe src="${src}" title="RapidShift ${widgetName}" allowtransparency="true" loading="lazy" scrolling="no" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>`;
+
+        this.iframeEl = this.shadow.querySelector("iframe");
+      }
+    };
+  };
+
+  for (const tag of ["rsl-embed", "rapidshift-widget", "rsl-widget"]) {
+    if (!customElements.get(tag)) {
+      customElements.define(tag, createWidgetClass(""));
+    }
+  }
+
+  for (const w of RSL_CUSTOM_WIDGET_TAGS) {
+    const tag = `rsl-${w}`;
+    if (!customElements.get(tag)) {
+      customElements.define(tag, createWidgetClass(w));
+    }
+  }
+
+  const win = window as unknown as { __rslResizeBound?: boolean };
+  if (!win.__rslResizeBound) {
+    win.__rslResizeBound = true;
+    window.addEventListener("message", (event: MessageEvent) => {
+      if (!event?.data || event.data.type !== "rsl-embed-resize") return;
+      const newHeight = Math.ceil(Number(event.data.height));
+      if (!newHeight || newHeight < 60) return;
+
+      const allSelectors = [
+        "rsl-embed",
+        "rapidshift-widget",
+        "rsl-widget",
+        ...RSL_CUSTOM_WIDGET_TAGS.map((w) => `rsl-${w}`),
+      ].join(",");
+
+      const nodes = document.querySelectorAll(allSelectors);
+      nodes.forEach((node) => {
+        const el = node as HTMLElement & { iframeEl?: HTMLIFrameElement | null };
+        if (el.iframeEl && el.iframeEl.contentWindow === event.source) {
+          el.iframeEl.style.height = `${newHeight}px`;
+        }
+      });
+    });
+  }
+}
+
+if (typeof window !== "undefined") {
+  ensureRslWebComponentsRegistered();
+}
+
 interface RslEmbedCardProps {
   spec: RslWidgetSpec;
   theme: "dark" | "light";
@@ -294,15 +485,19 @@ function RslEmbedCard({
   const [dynamicHeight, setDynamicHeight] = useState<number>(spec.minHeight);
 
   useEffect(() => {
+    ensureRslWebComponentsRegistered();
+  }, []);
+
+  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event?.data || event.data.type !== "rsl-embed-resize") return;
       if (
         iframeRef.current &&
         iframeRef.current.contentWindow === event.source
       ) {
-        const nextH = Number(event.data.height);
-        if (nextH && nextH >= 100) {
-          setDynamicHeight(Math.max(spec.minHeight, nextH));
+        const nextH = Math.ceil(Number(event.data.height));
+        if (nextH && nextH >= 60) {
+          setDynamicHeight(nextH);
         }
       }
     };
@@ -319,12 +514,13 @@ function RslEmbedCard({
   return (
     <div
       key={`${spec.id}-${theme}-${renderMode}`}
-      className="w-full max-w-2xl mx-auto"
+      className={`w-full ${
+        spec.fullWidth ? "col-span-1 xl:col-span-2" : "col-span-1"
+      }`}
     >
       {renderMode === "web-component" ? (
         <div className="w-full">
-          {createElement("rsl-embed", {
-            widget: spec.id,
+          {createElement(`rsl-${spec.id}`, {
             "api-key": apiKey,
             "client-id": clientId,
             theme,
@@ -338,13 +534,14 @@ function RslEmbedCard({
           src={embedUrl}
           title={`RapidShift ${spec.title}`}
           className="rounded-2xl w-full"
+           scrolling="no"
           style={{
             width: "100%",
             height: `${dynamicHeight}px`,
-            minHeight: `${spec.minHeight}px`,
             border: "none",
             display: "block",
             background: "transparent",
+            overflow: "hidden",
           }}
           loading="lazy"
           allow="clipboard-write"
